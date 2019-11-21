@@ -10,3 +10,4 @@
   1.3 逐行二分 O(nlogn) <br>
 2. [替换空格](https://github.com/Sonia-96/Coding4Interviews/tree/master/剑指offer/2-替换空格)
 3. [从尾到头打印链表](https://github.com/Sonia-96/Coding4Interviews/tree/master/剑指offer/3-从尾到头打印链表)
+4. [重建二叉树](https://github.com/Sonia-96/Coding4Interviews/tree/master/剑指offer/4-重建二叉树)
