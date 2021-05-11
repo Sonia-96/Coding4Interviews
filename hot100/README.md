@@ -6,7 +6,7 @@
 
 给定两个大小分别为 `m` 和 `n` 的正序（从小到大）数组 `nums1` 和 `nums2`。请你找出并返回这两个正序数组的 **中位数** 。
 
-## 方法一：归并排序
+## 法一：归并排序
 
 对两个数组进行归并排序，然后返回合并后的数组的中位数
 
@@ -93,7 +93,7 @@ class Solution {
 
 
 
-## ※方法二：二分查找
+## ※法二：二分查找
 
 令原数组为A和B，由于A和B都是排好序的，所以在查找中位数时可以使用**二分查找**。
 
@@ -163,5 +163,109 @@ class SOlution {
 
 
 
+# 5. 最长回文子串
 
+## 法一：动态规划
+
+令`P(i, j)`表示字符串 `s[i...j]` 是否为回文串：
+
+- 如果 `i == j`：`P(i, j) = true`
+- 如果 `j == i + 1`：
+  - 如果`Si == Sj`，则`P(i, j) = true`
+  - 否则`P(i, j) = false`
+- 其它情况下，`P(i, j) = P(i + 1, j - 1) ∧ (Si == Sj)`，
+
+则`P(i, j)`的状态转移方程为：
+$$
+P(i, j)=
+\begin{cases}
+true,& \text{i == j}\\
+Si == Sj, & \text{j == i + 1}\\
+P(i + 1, j - 1) ∧ (Si == Sj),&  \text{j > i + 1}\\
+\end{cases}
+$$
+
+记录下`P(i, j)`为`true`且长度最大时的i和j，即可得到最长回文子串。
+
+例如：对于字符串“babad”，其动态规划的备忘录如下。其中粉色箭头为填充顺序：从(0,0)开始，按对角线从左上到右下填充；然后是(0, 1)开始的对角线，(0,2) ...
+
+<img src="C:\Users\Sonia\AppData\Roaming\Typora\typora-user-images\image-20210511153545166.png" alt="image-20210511153545166" style="zoom:33%;" />
+
+```java
+class Solution {
+	public String longestPalindrome(String s) {
+        if (s.length() < 2) {
+            return s;
+        }
+        boolean[][] dp = new boolean[s.length()][s.length()];
+        for (int i = 0; i < s.length(); i++) { //所有长度为1的子串都是回文子串
+            dp[i][i] = true;
+        }
+        int maxLen = 1, start = 0;
+        for (int j = 1; j < s.length(); j++) { // j + 1为子串长度
+            for (int i = 0; i + j < s.length(); i++) { // i为左边界，i + j为右边界
+                if (s.charAt(i) != s.charAt(i + j)) {
+                    dp[i][i + j] = false;
+                } else {
+                    if (j == 1) {
+                        dp[i][i + j] = true;
+                    } else {
+                        dp[i][i + j] = dp[i + 1][i + j - 1];
+                    }
+                }
+                if (dp[i][i + j] && j + 1 > maxLen) {
+                    maxLen = j + 1;
+                    start = i;
+                }
+            }
+        }
+        return s.substring(start, start + maxLen);
+    }
+}
+```
+
+
+
+# 法二：中心扩展法
+
+可以发现，`P(i, j)`的**状态转移链**为：
+$$
+边界情况 → ... → P(i - 2, j + 2) → P(i - 1, j + 1) → P(i, j)
+$$
+上面的“边界情况”指的是P(i, i) 或P(i, i + 1），这里我们称为“回文中心”。因此，这个算法也叫做“中心扩展法”。
+
+对应下图中，状态转移链即为从`(i, i)` 或`(i, i + 1)`沿着对角线从左下到右上逐步计算回文长度。
+
+注意：如果`P(i, j)`为非回文，则不必继续计算`P(i + 1, j - 1)`及之后的情况，因为它们一定为非回文。
+
+<img src="C:\Users\Sonia\AppData\Roaming\Typora\typora-user-images\image-20210511154603366.png" alt="image-20210511154603366" style="zoom:33%;" />
+
+找到状态转移链后，就可以不用备忘录记录每个`P(i, j)`的值了，所以此方法本质上是在法一的基础上去掉了备忘录。
+
+```java
+class Solution {
+    public String longestPalindrome(String s) {
+        int maxLen = 0;
+        int start = 0;
+        for (int i = 0; i < s.length(); i++) {
+            int len1 = expandAroundCenter(s, i, i);
+            int len2 = expandAroundCenter(s, i, i + 1);
+            int len = Math.max(len1, len2);
+            if (len > maxLen) {
+                start = i - (len - 1) / 2;
+                maxLen = len;
+            }
+        }
+        return s.substring(start, start + maxLen);
+    }
+
+    private int expandAroundCenter(String s, int left, int right) {
+        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            left--;
+            right++;
+        }
+        return right - left - 1;
+    }
+}
+```
 
