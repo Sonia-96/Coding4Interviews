@@ -1,5 +1,7 @@
 [TOC]
 
+注：标注“※”的方法时间效率上高于同一题目的其它方法。
+
 
 
 # 4. 寻找两个正序数组的中位数
@@ -226,7 +228,7 @@ class Solution {
 
 
 
-## 法二：中心扩展法
+## ※法二：中心扩展法
 
 可以发现，`P(i, j)`的**状态转移链**为：
 $$
@@ -273,3 +275,116 @@ class Solution {
 
 # 6. Z字形变换
 
+将一个给定字符串 `s` 根据给定的行数 `numRows`，以从上往下、从左到右进行 Z 字形排列。
+
+比如输入字符串为 "`PAYPALISHIRING`" 行数为 3 时，排列如下：
+
+```
+P   A   H   N
+A P L S I I G
+Y   I   R
+```
+
+之后，你的输出需要从左往右逐行读取，产生出一个新的字符串，比如："`PAHNAPLSIIGYIR`"。
+
+## ※法一：推Z字形排序中字符下标的通项公式
+
+按照与逐行读取Z字形图案相同的顺序访问字符串。
+
+以`numRows = 5`为例：（下面`i`为行号）
+
+```
+【i = 0】 0       8             17
+【i = 1】 1     7 9          16 18
+【i = 2】 2   6   10       15   19
+【i = 3】 3 5     11    14      ...
+【i = 4】 4       12 13
+```
+
+- 第0行：字符的下标为`(2n - 2) * k`（为了方便，将`numRows`简写为`n`）
+- 第n - 1行：字符的下标为`(n - 1) + (2n - 2) * k`
+- 第 i 行：字符的下标有两种：`(2n - 2) * k + i`和`(2n - 2) * k - i`
+
+题解：
+
+```java
+class Solution {
+    public String convert(String s, int numRows) {
+        if (s.length() < 2 || numRows == 1 || numRows > s.length()) {
+            return s;
+        }
+        StringBuilder sb = new StringBuilder();
+        int cycleLen = 2 * numRows - 2;
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; i + j < s.length(); j += cycleLen) {
+                sb.append(s.charAt(i + j));
+                if (i != 0 && i != numRows - 1 && j + cycleLen - i < s.length()) {
+                    sb.append(s.charAt(j + cycleLen - i));
+                }
+            }
+        }
+        return sb.toString();
+    }
+}
+```
+
+- 时间复杂度：Θ(n)
+- 空间复杂度：Θ(n)
+
+## 法二：将字符直接放到对应的行里
+
+从左到右遍历字符串，可以发现，字符在Z字形排列时所在行号从`0`变化到`numRows - 1`，又从`numRows - 1` 变到`0`
+
+例：对"`PAYPALISHIRING`" ，`numRows = 5` 
+
+|      | P    | A    | Y    | P    | A    | L    | I    | S    | H    | I    | R    | I    | N    | G    |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+| 下标 | 0    | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    | 10   | 11   | 12   | 13   |
+| 行号 | 0    | 1    | 2    | 3    | 4    | 3    | 2    | 1    | 0    | 1    | 2    | 3    | 4    | 3    |
+
+- rows[0] = PH
+- rows[1] = ASI
+- rows[2] = YIR
+- rows[3] = PLIG
+- rows[4] = AN
+
+合起来：res = rows[0] + rows[1] + ... + rows[4] = PHASIYIRPLIGAN
+
+题解：
+
+```java
+class Solution {
+    public String convert(String s, int numRows) {
+        if (s.length() < 2 || numRows == 1 || numRows > s.length()) {
+            return s;
+        }
+        // 初始化
+        StringBuilder[] rows = new StringBuilder[numRows];
+        for (int i = 0; i < numRows; i++) {
+            rows[i] = new StringBuilder();
+        }
+        // 从左到右遍历字符串，并将字符放到对应的行里
+        int currRow = 0, increment = -1;
+        for (int i = 0; i < s.length(); i++) {
+            rows[currRow].append(s.charAt(i));
+            if (currRow == numRows - 1 || currRow == 0) {
+                increment *= -1;
+            }
+            currRow += increment;
+        }
+        // 按顺序合并各行的字符串
+        StringBuilder res = new StringBuilder();
+        for (StringBuilder row: rows) {
+            res.append(row);
+        }
+        return res.toString();
+    }
+}
+```
+
+- 时间复杂度：Θ(n)
+- 空间复杂度：Θ(n)
+
+## 反思
+
+法一推公式的过程比较不直观，且在代码实现上很容易出错；法二比较直观，代码实现简单，但是算法效率不如法一（虽然二者的时间复杂度都是Θ(n)）。
