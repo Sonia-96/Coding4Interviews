@@ -403,7 +403,7 @@ class Solution {
 
 ## 我的方法（非常naïve）
 
-策略：
+**策略：**
 
 - 标记数值的正负, `flag` = 1 或 -1
 
@@ -413,21 +413,24 @@ class Solution {
 
 - 判断数值溢出：
 
-  - 将最大值（`Integer.Max_VALUE`存成char[] b），若flag == -1，则末位变为'8'
+  - `Integer.MIN_VALUE` = -2147483648，`Integer.Max_VALUE` = 2147483647
+  - 将最大值（`Integer.Max_VALUE` ）用char[] b储存，若flag == -1，则末位变为`'8'`
   - 逐位比较a[i]和b[i]，若a[i] > b[i]，则return 0
 
 - 返回结果：把a变为数值，再乘上flag
 
-效率：
+**效率：**
 
 - 时间复杂度：Θ(n)
 - 空间复杂度：Θ(n)
+
+代码略。
 
 
 
 ## 更好的方法
 
-记原数值为`x`，翻转后的数字为`rev`。为了翻转`x`，我们可以不断从`x`中弹出末尾数字`digit`，再将其放入`rev`的末尾。
+记原数值为`x`，翻转后的数字为`rev`。要翻转`x`，我们可以不断从`x`中弹出末尾数字`digit`，再将其放入`rev`的末尾。
 
 ```java
 digit = x % 10; // 弹出x的末尾数字
@@ -435,12 +438,103 @@ x /= 10; // 更新x
 rev = rev * 10 + digit; // 将digit推入rev末尾
 ```
 
-在将`digit`推入`rev`前，要先判断这个操作会不会造成数值溢出，条件应是：
-
-`Integer.MIN_VALUE <= rev * 10 <= Integer.MAX_VALUE`
+在将`digit`推入`rev`前，要先判断这个操作会不会造成数值溢出，条件是：
+$$
+Integer.MIN\_VALUE / 10 <= rev <= Integer.MAX\_VALUE / 10
+$$
+<span style="color:red">**注意**</span>：这里不能写成
+$$
+Integer.MIN\_VALUE <= rev * 10 <= Integer.MAX\_VALUE
+$$
+因为rev * 10可能会存在数值溢出。
 
 证明：
 
-- 若rev*10的位数 < 最大值/最小值，则digit无论多少都不会造成数值溢出
-- 若rev*10的位数 == 最大值/最小值，则说明x的位数为10，digit为其最高位，则digit<=2，也不会造成数值溢出
+- 若rev * 10 < |最大值/最小值|，则digit无论多少都不会造成数值溢出
+- 若rev * 10 == |最大值/最小值|，则说明x的位数为10，digit为其最高位，则digit<=2，也不会造成数值溢出
 
+代码：
+
+```java
+class Solution {
+    public int reverse(int x) {
+        int rev = 0;
+        while (x != 0) {
+            if (rev < Integer.MIN_VALUE / 10 || rev > Integer.MAX_VALUE / 10) {
+                return 0;
+            }
+            int digit = x % 10;
+            x /= 10;
+            rev = rev * 10 + digit;
+        }
+        return rev;
+    }
+}
+```
+
+- 时间复杂度：Θ(n)（n为x的位数）
+
+- 空间复杂度：Θ(1)
+
+  
+
+# 78. 子集
+
+给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
+
+## 法一：迭代
+
+记原序列的元素总数为n。每个元素有出现（记为1）和不出现（记为0）两种状态，则子集一共有 2<sup>n </sup>种。
+
+以{1, 2, 3}为例，用**0/1序列**表示出现的元素，序列的倒数第i位对应元素的正数第i位，例如，序列100对应子集{3}。
+
+| 0/1序列 | 对应子集    | 对应二进制数 |
+| ------- | ----------- | ------------ |
+| 000     | {} （空集） | 0            |
+| 001     | {1}         | 1            |
+| 010     | {2}         | 2            |
+| 011     | {1, 2}      | 3            |
+| 100     | {3}         | 4            |
+| 101     | {1, 3}      | 5            |
+| 110     | {2, 3}      | 6            |
+| 111     | {1, 2, 3}   | 7            |
+
+可以发现，0/1序列正好是数字0~2<sup>n</sup>-1的二进制表示。所以我们可以枚举0~2<sup>n</sup>-1的二进制数字，然后将其转换成对应的子集。
+
+代码：
+
+```java
+class Solution {
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        int length = nums.length;
+        int n = 1 << length;
+        for (int i = 0; i < n; i++) {
+            List<Integer> subset = new ArrayList<>();
+            int index = i;
+            for (int j = 0; j < length; j++) {
+                if ((index & 1 ) == 1) {
+                    subset.add(nums[j]);
+                }
+                index >>= 1;
+            }
+            res.add(subset);
+        }
+        return res;
+    }
+}
+```
+
+- 时间复杂度：Θ(n * 2<sup>n</sup>) （ 共2<sup>n </sup>种子集，每个子集需要n个操作）
+
+- 空间复杂度：Θ(n)（临时数组所需空间）
+
+  
+
+**<u>笔记：</u>**
+
+- 1 << n = 2 <sup>n</sup>
+- n >> 1：将二进制数的各位全部右移1位。例如，1111 >> 1 后变为 0111
+- n & 1可判断n的奇偶性
+  - n & 1 == 1，则n为奇数
+  - n & 1 == 0，则n为偶数
