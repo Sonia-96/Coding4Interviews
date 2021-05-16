@@ -1,35 +1,35 @@
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
-public class q7_ReverseInteger {
+public class q7a_ReverseInteger {
     public int reverse(int x) {
-        int flag = x < 0 ? -1 : 1;
-        String s = String.valueOf(Math.abs(x));
+        int flag = x < 0 ? -1 : 1; //标记正负数
+        String s = String.valueOf(Math.abs(x)); // 将数值转换为字符串
+        // 翻转数值
         int i = s.length() - 1;
-        while (s.charAt(i) == 0) {
+        while (s.charAt(i) == 0) { //忽略末尾的0
             i -= 1;
         }
-        char[] tmp = new char[i + 1];
-        for (int j = 0; j < tmp.length && i >= 0; j++, i--) {
-            tmp[j] = s.charAt(i);
+        char[] rev = new char[i + 1];
+        for (int j = 0; j < rev.length && i >= 0; j++, i--) {
+            rev[j] = s.charAt(i);
         }
+        // 判断数值溢出
         char[] maxValue = String.valueOf(Integer.MAX_VALUE).toCharArray();
         if (flag < 0) {
             maxValue[9] = '8';
         }
-        if (tmp.length > 10) return 0;
-        if (tmp.length == 10) {
+        if (rev.length > 10) return 0;
+        if (rev.length == 10) {
             for (int j = 0; j < 10; j++) {
-                if (tmp[j] > maxValue[j]) {
+                if (rev[j] > maxValue[j]) {
                     return 0;
-                } else if (tmp[j] < maxValue[j]) {
+                } else if (rev[j] < maxValue[j]) {
                     break;
                 }
             }
         }
-        int res = Integer.parseInt(String.valueOf(tmp));
-        return res * flag;
+        return Integer.parseInt(String.valueOf(rev)) * flag;
     }
 
     @Test
