@@ -1,7 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class q78_Subsets {
+// Method 1: Binary Bit
+public class q78a_Subsets {
     public List<List<Integer>> subsets(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
         int length = nums.length;
