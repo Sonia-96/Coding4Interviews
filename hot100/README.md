@@ -1,8 +1,18 @@
-[TOC]
+| 题目                                                        | 难度 | 知识点              |
+| ----------------------------------------------------------- | ---- | ------------------- |
+| 1. 两数之和                                                 | 简单 |                     |
+| 2. 两数相加                                                 | 中等 |                     |
+| 3. 无重复字符的最长子串                                     | 中等 |                     |
+| [4. 寻找两个正序数组的中位数](#4. 寻找两个正序数组的中位数) | 困难 | 二分查找            |
+| [5. 最长回文子串](#5. 最长回文子串)                         | 中等 | 动态规划及其优化    |
+| [78. 子集](#78. 子集)                                       | 中等 | 位操作；DFS；回溯法 |
+|                                                             |      |                     |
+|                                                             |      |                     |
+|                                                             |      |                     |
+
+
 
 注：标注“※”的方法时间效率上高于同一题目的其它方法。
-
-
 
 # 4. 寻找两个正序数组的中位数
 
@@ -499,7 +509,7 @@ class Solution {
 | 110     | {2, 3}      | 6            |
 | 111     | {1, 2, 3}   | 7            |
 
-可以发现，0/1序列正好是数字0~2<sup>n</sup>-1的二进制表示。所以我们可以枚举0~2<sup>n</sup>-1的二进制数字，然后将其转换成对应的子集。
+可以发现，0/1序列正好是数字0\~2<sup>n</sup>-1的二进制表示。所以我们可以枚举0\~2<sup>n</sup>-1的二进制数字，然后将其转换成对应的子集。
 
 代码：
 
@@ -531,10 +541,72 @@ class Solution {
 
   
 
-**<u>笔记：</u>**
+**笔记：**
 
 - 1 << n = 2 <sup>n</sup>
 - n >> 1：将二进制数的各位全部右移1位。例如，1111 >> 1 后变为 0111
 - n & 1可判断n的奇偶性
   - n & 1 == 1，则n为奇数
   - n & 1 == 0，则n为偶数
+
+
+
+## 法二：DFS
+
+每个元素有“选”与“不选”两种状态，假设“不选”进入左子树，“选”进入右子树，第i层代表第i个元素的选择情况，可以画出一棵完全二叉树，它的一个叶结点表示一种子集。用DFS遍历该二叉树，即可得到所有子集。
+
+<img src="E:\1-CS\0-刷题\Coding4Interviews\hot100\images\596a16391607ec3505794d6ecb4d5d854f480440f025fc646c9f6225f83412e0-image.png" alt="image.png" style="zoom:60%;" />
+
+代码：
+
+```java
+class Solution {
+    public List<List<Integer>> res = new ArrayList<>();
+    public List<Integer> subset = new ArrayList<>();
+
+    public List<List<Integer>> subsets(int[] nums) {
+        dfs(0, nums);
+        return res;
+    }
+
+    public void dfs(int i, int[] nums) {
+        if (i == nums.length) {
+            res.add(new ArrayList(subset));
+            return;
+        }
+        subset.add(nums[i]);
+        dfs(i + 1, nums);
+        subset.remove(subset.size() - 1);
+        dfs(i + 1, nums);
+    }
+}
+```
+
+
+
+## 法三：回溯法
+
+每个元素不再有“选”与“不选”两种状态，而是考虑它被选之后还有什么元素可选。对每一个元素，它的下一个元素的可选范围应该为原数组内位于它之后的元素；
+
+<img src="E:\1-CS\0-刷题\Coding4Interviews\hot100\images\d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树.png" alt="子集问题递归树.png" style="zoom:70%;" />
+
+```java
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    List<Integer> subset = new ArrayList<>();
+
+    public List<List<Integer>> subsets(int[] nums) {
+        backtrack(0, nums);
+        return res;
+    }
+
+    public void backtrack(int i, int[] nums) {
+        res.add(new ArrayList(subset));
+        for (int j = i; j < nums.length; j++) {
+            subset.add(nums[j]);
+            backtrack(j + 1, nums);
+            subset.remove(subset.size() - 1);
+        }
+    }
+}
+```
