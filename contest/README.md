@@ -3,7 +3,7 @@
 | 日期       | #周赛 | 题目                                                         | 解决数 | 排名        |
 | ---------- | ----- | ------------------------------------------------------------ | ------ | ----------- |
 | 2021-05-16 | 241   | [1863. 找出所有子集的异或总和再求和](#1863. 找出所有子集的异或总和再求和)<br>[1864. 构成交替字符串需要的最小交换次数](#1864. 构成交替字符串需要的最小交换次数)<br>1865. 找出和为指定值的下标对<br>1866. 恰有 K 根木棍可以看到的排列数目 | 1/4    | 2627 / 4490 |
-| 2021-05-23 | 242   | 5763. 哪种连续字符串更长<br>5764. 准时到达的列车最小时速<br>[5765. 跳跃游戏VII](#5765. 跳跃游戏VII) | 1/4    | 27096/53593 |
+| 2021-05-23 | 242   | 1869. 哪种连续字符串更长<br>1870. 准时到达的列车最小时速<br>[1871. 跳跃游戏VII](#1871. 跳跃游戏VII) | 1/4    | 27096/53593 |
 |            |       |                                                              |        |             |
 
 
@@ -139,11 +139,35 @@ class Solution {
 
 # 周赛242
 
-## 5763. 哪种连续子字符串更长
+## 1869. 哪种连续子字符串更长
+
+```java
+public class Solution {
+        public boolean checkZeroOnes(String s) {
+        int len1 = consecutiveLength(s, '1');
+        int len0 = consecutiveLength(s, '0');
+        return len1 > len0;
+    }
+
+    public int consecutiveLength(String s, char c) {
+        int maxLen = 0, cnt = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == c) {
+                cnt += 1;
+            } else {
+                maxLen = Math.max(maxLen, cnt);
+                cnt = 0;
+            }
+        }
+        maxLen = Math.max(maxLen, cnt); // 对字符串末尾的连续子串
+        return maxLen;
+    }
+}
+```
 
 
 
-## 5764. 准时到达的列车最小时速
+## 1870. 准时到达的列车最小时速
 
 使用二分法搜索。
 
@@ -213,7 +237,7 @@ public class Solution {
 
 
 
-## [5765. 跳跃游戏VII](https://leetcode-cn.com/problems/jump-game-vii/)
+## [1871. 跳跃游戏VII](https://leetcode-cn.com/problems/jump-game-vii/)
 
 ### 法一：动态规划
 
