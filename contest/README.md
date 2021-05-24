@@ -3,7 +3,7 @@
 | 日期       | #周赛 | 题目                                                         | 解决数 | 排名        |
 | ---------- | ----- | ------------------------------------------------------------ | ------ | ----------- |
 | 2021-05-16 | 241   | [1863. 找出所有子集的异或总和再求和](#1863. 找出所有子集的异或总和再求和)<br>[1864. 构成交替字符串需要的最小交换次数](#1864. 构成交替字符串需要的最小交换次数)<br>1865. 找出和为指定值的下标对<br>1866. 恰有 K 根木棍可以看到的排列数目 | 1/4    | 2627 / 4490 |
-|            |       |                                                              |        |             |
+| 2021-05-23 | 242   |                                                              | 1/4    | 27096/53593 |
 |            |       |                                                              |        |             |
 
 
@@ -134,4 +134,143 @@ class Solution {
     }
 }
 ```
+
+
+
+# 周赛242
+
+## 5763. 哪种连续子字符串更长
+
+
+
+## 5764. 准时到达的列车最小时速
+
+
+
+## [5765. 跳跃游戏VII](https://leetcode-cn.com/problems/jump-game-vii/)
+
+### 法一：动态规划
+
+令`f[i]`表示能否从位置0跳到位置`i`，则`f(i) = true`的条件为：
+
+- `s[i] = '0'`
+- 假设最后一步是从位置`j`跳到位置`i`的，则
+  -  `j`的取值为：`i - maxJump <= j <= i - minJump`且`j`>=0
+  - 对以上`j`的取值，至少有一个`f[j]`为`true`
+
+因此，本题的状态转移方程为：
+$$
+f(i) = any(f(j))，其中 j∈[i−maxJump,i−minJump] 且 j≥0
+$$
+
+
+
+记`left = i - maxJump`，`right = i - minJump`，则j的取值范围为[left, right]。那么，如何检验其中是否有`f[j]`为`true`？
+
+- 初级：遍历f[left] ~ f[right]，检查是否有f[j]为true
+- 优化：用一个值`total`记录f[left] ~ f[right]的和，若`total>0`则至少有一个`f[j]`为`true`，则f[i]=true
+
+于是，状态转移方程可优化为：
+$$
+f(i) =(\sum_{j=left}^{right}f(j) > 0) =( total > 0 )
+$$
+
+
+
+那么，如何计算`total`？
+
+- 初级：设置前缀数组`pre`，`pre[i]`表示`dp[0...i]`的和，则f[i]的total = pre[right] - pre[left - 1]
+- 优化：**滑窗法**
+  - 由于[left, right]区间长度固定，`i`每增加1，区间就向右滑动一格，因此只需用一个值记录窗口内的和，无需使用前缀数组
+  - 注意：当 i 处于 `[minJump, maxJump)` 时，滑窗尚不完整，需特殊处理
+
+代码：
+
+```java
+public class Solution {
+    public boolean canReach(String s, int minJump, int maxJump) {
+        boolean[] dp = new boolean[s.length()];
+        dp[0] = true;
+        int total = 1;
+        for (int i = minJump; i < s.length(); i++) {
+            int left = i - maxJump, right = i - minJump;
+            if (i > minJump) { // i > minJump时，窗口右端才开始滑动
+                total += dp[right] ? 1 : 0;
+            }
+            if (left > 0) { // left > 0时，窗口左端才开始滑动
+                total -= dp[left - 1] ? 1 : 0;
+            }
+            dp[i] = s.charAt(i) == '0' && total >0;
+        }
+        return dp[s.length() - 1];
+    }
+}
+```
+
+
+
+总结：动态规划的优化思路
+
+- 首先推出状态转移方程：f(i) = any(f(j))
+
+- 判断对j∈[left, right]是否有f(j)为true：
+  - 初级：从左到右遍历，时间复杂度为Θ(M)，其中M=right - left + 1
+  - 进阶：想到f(i)=(Σf(j)> 0)，使用**前缀数组**可以将这一步的时间复杂度降至Θ(1)，但内存使用增加Θ(N)
+  - 最优：由于[left, right]区间长度固定，可使用**滑窗法**取代前缀数组，使内存进一步优化
+
+
+
+### 法二：BFS
+
+模拟跳跃游戏的过程：
+
+- 从下标`i`起跳，则可到达的区域为：[i + minJump, i + maxJump]中为字符为'0'的下标。记到达的位置为j。
+- 又从`j`起跳，可达到的区域为： [j + minJump, j + maxJump]中字符为'0'的下标
+- ……
+- 重复以上过程，如果访问到位置`s.length() - 1`且该位置为0，则返回true；如果该位置为1或不能到达该位置，则返回false。
+
+
+
+代码实现：BFS
+
+- 用队列储存待访问的位置。首先放入下标0
+- 弹出并访问位置0，并放入下一步能到达的下标（即[left, right]中字符0的下标）
+- 弹出队首结点并访问，并放入下一步能达到的下标
+- 重复上一步直至队列为空
+
+在以上方法中，结点会被重复访问（假设minJump=1，maxJump=2，则0和1被访问1次，2被访问2次，3被访问3次，n被访问n次……），算法的时间复杂度为Θ(n<sup>2</sup>)，从而导致超时。
+
+为了避免重复访问，用指针`last`记录最后访问的位置，每一次从[max(last + 1, left), right]中往队列内放入下一步能到达的下标。
+
+代码：
+
+```java
+public class SOlution {
+    public boolean canReach(String s, int minJump, int maxJump) {
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(0);
+        int last = 0;
+        while (!queue.isEmpty()) {
+            int curr = queue.remove();
+            if (curr == s.length() - 1 && s.charAt(curr) == '0') {
+                return true;
+            }
+            int left = curr + minJump, right = Math.min(curr + maxJump, s.length() - 1);
+            for (int i = Math.max(left, last + 1); i <= right; i++) {
+                if (s.charAt(i) == '0') {
+                    last = i;
+                    queue.add(i);
+                }
+            }
+        }
+        return false;
+    }
+}
+```
+
+
+
+
+
+
 

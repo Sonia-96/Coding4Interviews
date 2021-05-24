@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class q5865a_JumpGameVII {
+    // 动态规划 + 前缀数组
     public boolean canReach(String s, int minJump, int maxJump) {
         boolean[] dp = new boolean[s.length()];
         dp[0] = true;

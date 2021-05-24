@@ -1,25 +1,31 @@
 import org.junit.Test;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class q5865b_JumpGameVII {
-    // 动态规划 + 滑窗
+public class q5865c_JumpGameVII {
+    // BFS + 指针优化
     public boolean canReach(String s, int minJump, int maxJump) {
-        boolean[] dp = new boolean[s.length()];
-        dp[0] = true;
-        int total = 1;
-        for (int i = minJump; i < s.length(); i++) {
-            int left = i - maxJump, right = i - minJump;
-            if (i > minJump) { // i > minJump时窗口右端才开始移动
-                total += dp[right] ? 1 : 0;
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(0);
+        int last = 0;
+        while (!queue.isEmpty()) {
+            int curr = queue.remove();
+            if (curr == s.length() - 1 && s.charAt(curr) == '0') {
+                return true;
             }
-            if (left > 0) { // left > 0时窗口左端才开始移动
-                total -= dp[left - 1] ? 1 : 0;
+            int left = curr + minJump, right = Math.min(curr + maxJump, s.length() - 1);
+            for (int i = Math.max(left, last + 1); i <= right; i++) {
+                if (s.charAt(i) == '0') {
+                    last = i;
+                    queue.add(i);
+                }
             }
-            dp[i] = s.charAt(i) == '0' && total >0;
         }
-        return dp[s.length() - 1];
+        return false;
     }
 
     @Test
