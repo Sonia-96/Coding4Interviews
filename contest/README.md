@@ -3,7 +3,7 @@
 | 日期       | #周赛 | 题目                                                         | 解决数 | 排名        |
 | ---------- | ----- | ------------------------------------------------------------ | ------ | ----------- |
 | 2021-05-16 | 241   | [1863. 找出所有子集的异或总和再求和](#1863. 找出所有子集的异或总和再求和)<br>[1864. 构成交替字符串需要的最小交换次数](#1864. 构成交替字符串需要的最小交换次数)<br>1865. 找出和为指定值的下标对<br>1866. 恰有 K 根木棍可以看到的排列数目 | 1/4    | 2627 / 4490 |
-| 2021-05-23 | 242   |                                                              | 1/4    | 27096/53593 |
+| 2021-05-23 | 242   | 5763. 哪种连续字符串更长<br>5764. 准时到达的列车最小时速<br>[5765. 跳跃游戏VII](#5765. 跳跃游戏VII) | 1/4    | 27096/53593 |
 |            |       |                                                              |        |             |
 
 
@@ -145,6 +145,72 @@ class Solution {
 
 ## 5764. 准时到达的列车最小时速
 
+使用二分法搜索。
+
+- 速度的上下界：
+  - 下界：minV = 1
+  - 上界：maxV = 10<sup>5</sup>/0.01 = 10<sup>7</sup>（因为dist[i] <=10<sup>5</sup>，hour至多两位小数，所以时间最小值为0.01h）
+  - （上下界可继续缩小，不过影响不大）
+- **<u>计算中位数</u>**：midV = minV + (maxV - minV) / 2 （这种写法可以避免minV + maxV造成数值溢出）
+- 计算midV到达终点所需时间time
+  - 对dist[0] ~ dist[n - 2]：由于列车整点发车，所以时间必须取整。<u>**取整有两种方法**</u>:
+    - (dist[i] - 1) / midV + 1
+    - Math.ceil(dist[i] / midV)
+  - dist[n - 1]不用取整
+- 二分搜索：while minV < maxV：
+  - 如果time <= hour：可以按时到达，但此时的midV未必是最小值，要继续向下寻找，则maxV=midV
+  - 如果time > hour：说明midV小了，要向上寻找，则minV=midV + 1
+
+
+
+本题难点：
+
+- 界定速度的上下界
+- 浮点数的比较（误差多少算相等？）
+- 二分搜索中[minV, maxV] 的变化（midV加不加一很重要）
+
+
+
+代码：
+
+```java
+public class Solution {
+    public int minSpeedOnTime(int[] dist, double hour) {
+        if (dist.length - 1 >= hour) {
+            return -1;
+        }
+        int minV = 1;
+        int maxV = 10000000;
+        while (minV < maxV) {
+            int midV = (minV + maxV) / 2;
+            double time = getTime(dist, midV);
+            if (time <= hour) {
+                maxV = midV;
+            } else {
+                minV = midV + 1;
+            }
+        }
+        return minV;
+    }
+
+    public double getTime(int[] dist, int midV) {
+        double t = 0;
+        for (int i = 0; i < dist.length - 1; i++) {
+            t += Math.ceil((dist[i] + 0.0)/ midV);
+        }
+        t += (dist[dist.length - 1] + 0.0) / midV;
+        return t;
+    }
+}
+```
+
+- 时间复杂度：Θ(NlogN)
+- 空间复杂度：Θ(1)
+
+
+
+反思：比赛时想到从最小速度往上逐个暴力搜索，结果毫不意外地TLE了。当时没想到速度的上界（其实现在想来可以试试用`Integer.MAX_VALUE`的），如果想到一定会使用二分搜索的。就差一点点了呀，下次比赛的时候要再多思考下！
+
 
 
 ## [5765. 跳跃游戏VII](https://leetcode-cn.com/problems/jump-game-vii/)
@@ -207,6 +273,9 @@ public class Solution {
 }
 ```
 
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(N)
+
 
 
 总结：动态规划的优化思路
@@ -268,9 +337,14 @@ public class SOlution {
 }
 ```
 
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(N)
 
 
 
+### 反思
+
+比赛的时候我的方法类似法二，但是当时没有意识到这是BFS，采用了递归的实现方法，得到了TLE，但是没有找到超时的原因，故最终没有通过。看来我对算法的掌握还是不够熟练。
 
 
 
