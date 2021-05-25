@@ -31,7 +31,7 @@
 class Solution {
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
         int[] nums = mergeSort(nums1, nums2);
-        if (nums.length % 2 == 1) {
+        if ((nums.length & 1) == 1) {
             return nums[nums.length / 2];
         } else {
             return (nums[nums.length / 2] + nums[nums.length / 2 - 1] + 0.0) / 2;
@@ -201,7 +201,7 @@ $$
 
 记录下`P(i, j)`为`true`且长度最大时的i和j，即可得到最长回文子串。
 
-例如：对于字符串“babad”，其动态规划的备忘录如下。其中粉色箭头为填充顺序：从(0,0)开始，按对角线从左上到右下填充；然后是(0, 1)开始的对角线，(0,2) ...
+例如：对于字符串“babad”，其动态规划的备忘录如下。其中粉色箭头为备忘录的填充顺序：从(0,0)开始，按对角线从左上到右下填充；然后是(0, 1)开始的对角线，(0,2) ...
 
 <img src="C:\Users\Sonia\AppData\Roaming\Typora\typora-user-images\image-20210511153545166.png" alt="image-20210511153545166" style="zoom:33%;" />
 
@@ -494,7 +494,7 @@ class Solution {
 
 给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
 
-## 法一：迭代
+## 法一：二进制表示
 
 记原序列的元素总数为n。每个元素有出现（记为1）和不出现（记为0）两种状态，则子集一共有 2<sup>n </sup>种。
 
@@ -511,7 +511,7 @@ class Solution {
 | 110     | {2, 3}      | 6            |
 | 111     | {1, 2, 3}   | 7            |
 
-可以发现，0/1序列正好是数字0\~2<sup>n</sup>-1的二进制表示。所以我们可以枚举0\~2<sup>n</sup>-1的二进制数字，然后将其转换成对应的子集。
+可以发现，0/1序列正好是数字0\~2<sup>n</sup>-1的二进制表示，所以我们可以枚举0\~2<sup>n</sup>-1的二进制数字，然后将其转换成对应的子集。
 
 代码：
 
@@ -519,16 +519,13 @@ class Solution {
 class Solution {
     public List<List<Integer>> subsets(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
-        int length = nums.length;
-        int n = 1 << length;
+        int n = 1 << nums.length;
         for (int i = 0; i < n; i++) {
             List<Integer> subset = new ArrayList<>();
-            int index = i;
-            for (int j = 0; j < length; j++) {
-                if ((index & 1 ) == 1) {
+            for (int j = 0, index = i; j < nums.length && index != 0; j++, index >>= 1) {
+                if ((index & 1) == 1) {
                     subset.add(nums[j]);
                 }
-                index >>= 1;
             }
             res.add(subset);
         }
@@ -545,7 +542,7 @@ class Solution {
 
 **笔记：**
 
-- 1 << n = 2 <sup>n</sup>
+- 1 << n = 100...00 （共n个0）= 2 <sup>n</sup>
 - n >> 1：将二进制数的各位全部右移1位。例如，1111 >> 1 后变为 0111
 - n & 1可判断n的奇偶性
   - n & 1 == 1，则n为奇数
