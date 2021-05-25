@@ -12,21 +12,20 @@ public class q3_LengthOfLongestSubstring {
      * - Memory Complexity: O(∣Σ∣)
      */
     public int lengthOfLongestSubstring(String s) {
-        int[] prevIndex = new int[128];
-        Arrays.fill(prevIndex, -1);
-        int maxLen = 0, prevLen = 0;
+        int[] occ = new int[128]; // 哈希表长度视字符范围而定
+        Arrays.fill(occ, -1);
+        int maxLen = 0, curLen = 0;
         for (int i = 0; i < s.length(); i++) {
-            if (prevIndex[s.charAt(i)] == -1 || i - prevIndex[s.charAt(i)] > prevLen) {
-                prevLen += 1;
+            int d = i - occ[s.charAt(i)];
+            if (d > curLen) {
+                curLen += 1;
             } else {
-                prevLen = i - prevIndex[s.charAt(i)];
+                maxLen = Math.max(maxLen, curLen);
+                curLen = d;
             }
-            prevIndex[s.charAt(i)] = i;
-            if (prevLen > maxLen) {
-                maxLen = prevLen;
-            }
+            occ[s.charAt(i)] = i;
         }
-        return maxLen;
+        return Math.max(maxLen, curLen); // 考虑以最后一个字符结尾的子串
     }
 
     /**
@@ -35,17 +34,17 @@ public class q3_LengthOfLongestSubstring {
      * - Memory Complexity: O(∣Σ∣)
      */
     public int lengthOfLongestSubstring2(String s) {
-        int rk = -1, res = 0;
         HashSet<Character> occ = new HashSet<>();
-        for (int lk = 0; lk < s.length(); lk++) {
-            while (rk + 1 < s.length() && !occ.contains(s.charAt(rk + 1))) {
-                rk += 1;
-                occ.add(s.charAt(rk));
+        int right = -1, maxLen = 0;
+        for (int left = 0; left < s.length(); left++) {
+            while (right + 1 < s.length() && !occ.contains(s.charAt(right + 1))) {
+                right += 1;
+                occ.add(s.charAt(right));
             }
-            res = Math.max(res, occ.size());
-            occ.remove(s.charAt(lk));
+            maxLen = Math.max(occ.size(), maxLen);
+            occ.remove(s.charAt(left));
         }
-        return res;
+        return maxLen;
     }
 
     @Test
