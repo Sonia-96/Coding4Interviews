@@ -42,7 +42,7 @@ public class q2_AddTwoNumbers {
 
     // solution
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        ListNode root = new ListNode(-1), p = root; // 首结点为哨兵结点
+        ListNode head = new ListNode(-1), p = head; // 首结点为哨兵结点
         int carry = 0;
         while (l1 != null || l2 != null || carry == 1) {
             int sum = carry;
@@ -59,7 +59,7 @@ public class q2_AddTwoNumbers {
             p.next = new ListNode(sum);
             p = p.next;
         }
-        return root.next;
+        return head.next;
     }
 
     // print the link list
