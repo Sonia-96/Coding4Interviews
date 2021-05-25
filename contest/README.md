@@ -333,12 +333,12 @@ public class Solution {
 
 在以上方法中，结点会被重复访问（假设minJump=1，maxJump=2，则0和1被访问1次，2被访问2次，3被访问3次，n被访问n次……），算法的时间复杂度为Θ(n<sup>2</sup>)，从而导致超时。
 
-为了避免重复访问，用指针`last`记录最后访问的位置，每一次从[max(last + 1, left), right]中往队列内放入下一步能到达的下标。
+为了避免重复访问，用指针`last`记录最后访问的位置，每次从[max(last + 1, left), right]中往队列内放入下一步能到达的下标。
 
 代码：
 
 ```java
-public class SOlution {
+public class Solution {
     public boolean canReach(String s, int minJump, int maxJump) {
         Queue<Integer> queue = new LinkedList<>();
         queue.add(0);
@@ -351,10 +351,10 @@ public class SOlution {
             int left = curr + minJump, right = Math.min(curr + maxJump, s.length() - 1);
             for (int i = Math.max(left, last + 1); i <= right; i++) {
                 if (s.charAt(i) == '0') {
-                    last = i;
                     queue.add(i);
                 }
             }
+            last = right;
         }
         return false;
     }

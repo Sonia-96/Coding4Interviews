@@ -20,10 +20,10 @@ public class q5865c_JumpGameVII {
             int left = curr + minJump, right = Math.min(curr + maxJump, s.length() - 1);
             for (int i = Math.max(left, last + 1); i <= right; i++) {
                 if (s.charAt(i) == '0') {
-                    last = i;
                     queue.add(i);
                 }
             }
+            last = right;
         }
         return false;
     }

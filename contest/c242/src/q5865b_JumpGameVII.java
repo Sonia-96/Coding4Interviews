@@ -11,7 +11,7 @@ public class q5865b_JumpGameVII {
         int total = 1;
         for (int i = minJump; i < s.length(); i++) {
             int left = i - maxJump, right = i - minJump;
-            if (i > minJump) { // i > minJump时窗口右端才开始移动
+            if (right > 0) { // right > 0时窗口右端才开始移动
                 total += dp[right] ? 1 : 0;
             }
             if (left > 0) { // left > 0时窗口左端才开始移动
