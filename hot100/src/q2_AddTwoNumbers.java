@@ -42,30 +42,24 @@ public class q2_AddTwoNumbers {
 
     // solution
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        ListNode head = null, p = null;
-        ListNode p1 = l1;
-        ListNode p2 = l2;
+        ListNode root = new ListNode(-1), p = root; // 首结点为哨兵结点
         int carry = 0;
-        while (p1 != null || p2 != null) {
-            int n1 = (p1 == null ? 0 : p1.val);
-            int n2 = (p2 == null ? 0 : p2.val);
-            int sum = n1 + n2 + carry;
-            p1 = (p1 == null ? null : p1.next);
-            p2 = (p2 == null ? null : p2.next);
-
+        while (l1 != null || l2 != null || carry == 1) {
+            int sum = carry;
+            if (l1 != null) {
+                sum += l1.val;
+                l1 = l1.next;
+            }
+            if (l2 != null) {
+                sum += l2.val;
+                l2 = l2.next;
+            }
             carry = sum / 10;
             sum = sum % 10;
-            if (p == null) {
-                head = p = new ListNode(sum, null);
-            } else {
-                p.next = new ListNode(sum, null);
-                p = p.next;
-            }
+            p.next = new ListNode(sum);
+            p = p.next;
         }
-        if (carry == 1) {
-            p.next = new ListNode(1, null);
-        }
-        return head;
+        return root.next;
     }
 
     // print the link list
