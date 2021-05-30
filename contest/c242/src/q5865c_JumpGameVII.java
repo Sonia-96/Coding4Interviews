@@ -14,7 +14,7 @@ public class q5865c_JumpGameVII {
         int last = 0;
         while (!queue.isEmpty()) {
             int curr = queue.remove();
-            if (curr == s.length() - 1 && s.charAt(curr) == '0') {
+            if (curr == s.length() - 1) {
                 return true;
             }
             int left = curr + minJump, right = Math.min(curr + maxJump, s.length() - 1);
