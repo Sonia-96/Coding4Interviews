@@ -2,6 +2,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class q6b_ConvertStringInZ {
+    // 方法二：将字符放到对应的行里，再合并各行
     public String convert(String s, int numRows) {
         if (s.length() < 2 || numRows == 1 || numRows > s.length()) {
             return s;

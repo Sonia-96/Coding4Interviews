@@ -2,6 +2,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class q6a_ConvertStringInZ {
+    // 方法一：推出每行字符下标的通项公式
     public String convert(String s, int numRows) {
         if (s.length() < 2 || numRows == 1 || numRows > s.length()) {
             return s;
