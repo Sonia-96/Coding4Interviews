@@ -1,20 +1,115 @@
-| 题目                                                        | 难度 | 知识点              |
-| ----------------------------------------------------------- | ---- | ------------------- |
-| 1. 两数之和                                                 | 简单 |                     |
-| 2. 两数相加                                                 | 中等 |                     |
-| 3. 无重复字符的最长子串                                     | 中等 |                     |
-| [4. 寻找两个正序数组的中位数](#4. 寻找两个正序数组的中位数) | 困难 | 二分查找            |
-| [5. 最长回文子串](#5. 最长回文子串)                         | 中等 | 动态规划及其优化    |
-| [78. 子集](#78. 子集)                                       | 中等 | 位操作；DFS；回溯法 |
-|                                                             |      |                     |
-|                                                             |      |                     |
-|                                                             |      |                     |
+| 题目                                                        | 难度 | 知识点                     |
+| ----------------------------------------------------------- | ---- | -------------------------- |
+| 1. 两数之和                                                 | 简单 |                            |
+| [2. 两数相加](#2. 两数相加)                                 | 中等 |                            |
+| [3. 无重复字符的最长子串](#3. 无重复字符的最长子串)         | 中等 | 动态规划；滑动窗口；双指针 |
+| [4. 寻找两个正序数组的中位数](#4. 寻找两个正序数组的中位数) | 困难 | 二分查找                   |
+| [5. 最长回文子串](#5. 最长回文子串)                         | 中等 | 动态规划及其优化           |
+| [78. 子集](#78. 子集)                                       | 中等 | 位操作；DFS；回溯法        |
+|                                                             |      |                            |
+|                                                             |      |                            |
+|                                                             |      |                            |
 
 刷题网站：https://leetcode-cn.com/problem-list/2cktkvj/
 
 注：标注“※”的方法时间效率上高于同一题目的其它方法。
 
 
+
+# 2. 两数加和
+
+```java
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode root = new ListNode(-1), p = root; // 首结点为哨兵结点
+        int carry = 0;
+        while (l1 != null || l2 != null || carry == 1) {
+            int sum = carry;
+            if (l1 != null) {
+                sum += l1.val;
+                l1 = l1.next;
+            }
+            if (l2 != null) {
+                sum += l2.val;
+                l2 = l2.next;
+            }
+            carry = sum / 10;
+            sum = sum % 10;
+            p.next = new ListNode(sum);
+            p = p.next;
+        }
+        return root.next;
+    }
+}
+```
+
+
+
+
+
+# 3. 无重复字符的最长子串
+
+## 法一：动态规划 + 哈希
+
+定义f(i)为以第i个字符结尾的无重复字符的子串的最长长度。
+
+- 使用哈希表记录每个字符上一次出现的位置，如果未出现则记为-1
+  - 哈希表长度视字符范围而定：
+    - ASCII: 128
+
+- 如果第i个字符之前没出现过：f(i) = f(i-1) + 1
+
+- 如果第i个字符之前出现过：假设上一次出现和这一次出现的位置的距离为d
+  - 如果d <= f(i-1)：这个字符上一次出现在f(i-1)对应的最长子串中，则f(i) = d
+  - 如果d > f(i-1)：这个字符上一次出现在f(i-1)对应的最长子串的前面，则f(i)=f(i-1)+1
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int[] prevIndex = new int[128];
+        Arrays.fill(prevIndex, -1);
+        int maxLen = 0, curLen = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (i - prevIndex[s.charAt(i)] > curLen) {
+                curLen += 1;
+            } else {
+                curLen = i - prevIndex[s.charAt(i)];
+                maxLen = Math.max(maxLen, curLen);
+            }
+            prevIndex[s.charAt(i)] = i;
+        }
+        return Math.max(maxLen, curLen);
+    }
+}
+```
+
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(|Σ|)
+
+## 法二：滑动窗口
+
+设置一个窗口，一开始窗口左界为0，右界为-1（即窗口长度为0）。用`Set`记录窗口内的字符，如果下一个字符不在窗口内，则将下一个字符放入窗口内，即窗口右界+1；否则窗口左界右移至下一个字符不在窗口内为止。一直向右滑动窗口，直至窗口左界=`s.length() - 1`。最后返回滑动过程中窗口的最大长度。
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring2(String s) {
+        HashSet<Character> occ = new HashSet<>();
+        int right = -1, maxLen = 0;
+        for (int left = 0; left < s.length(); left++) {
+            while (right + 1 < s.length() && !occ.contains(s.charAt(right + 1))) {
+                right += 1;
+                occ.add(s.charAt(right));
+            }
+            maxLen = Math.max(occ.size(), maxLen);
+            occ.remove(s.charAt(left));
+        }
+        return maxLen;
+    }
+}
+```
+
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(|Σ|)
 
 # 4. 寻找两个正序数组的中位数
 
