@@ -6,8 +6,8 @@
 | [4. 寻找两个正序数组的中位数](#4. 寻找两个正序数组的中位数) | 困难 | 二分查找                   |
 | [5. 最长回文子串](#5. 最长回文子串)                         | 中等 | 动态规划及其优化           |
 | [78. 子集](#78. 子集)                                       | 中等 | 位操作；DFS；回溯法        |
-|                                                             |      |                            |
-|                                                             |      |                            |
+| 10. 正则表达式匹配                                          | 困难 | 递归；动态规划             |
+| 11. 盛最多水的容器                                          | 中等 | 双指针法                   |
 |                                                             |      |                            |
 
 刷题网站：https://leetcode-cn.com/problem-list/2cktkvj/
@@ -559,7 +559,137 @@ class Solution {
 
 - 空间复杂度：Θ(1)
 
-  
+
+
+
+# 10. 正则表达式匹配
+
+## 法一：递归
+
+每次取字符串s的第一个字符与模式串p的第一个字符匹配。
+
+- 如果p[1] != *：直接比较s[0]和p[0]
+
+- 如果p[1] == *：
+
+- - 如果s[0] == p[0]或p[0]=='.'，则接下来有两种选择
+
+  - - 不要这次匹配：return  match(s, p[2:]）
+    - 下一个字符继续匹配当前模式：return match(s[1:], p）
+
+  - 否则：当前字符匹配失败，与模式串的下一个字符进行匹配：return match(s, p[2:])
+
+```java
+class Solution {
+    public boolean isMatch(String s, String p) {
+        return match(s, 0, p, 0);
+    }
+
+    private boolean match(String s, int i, String p, int j) {
+        if (j == p.length()) {
+            return i == s.length();
+        }
+        boolean firstMatch = (i != s.length()) && (s.charAt(i) == p.charAt(j) || p.charAt(j) == '.');
+        if (j + 1 < p.length() && p.charAt(j + 1) == '*') {
+            if (firstMatch) {
+                return match(s, i + 1, p, j) || match(s, i, p, j + 2);
+            }
+            return match(s, i, p, j + 2);
+        }
+        return firstMatch && match(s, i + 1, p, j + 1);
+    }
+}
+```
+
+- 时间复杂度：Θ(min(m, n)) ~ O(nm<sup>3</sup>)
+
+  最糟糕的情况下，'*'前的字母与s中的字母一样，但又必须放弃匹配。
+
+  例如：s="aaaaa", p="a\*a\*a\*a\*aaaaa"，此时，match(s, i, p, j)被执行的次数为：
+
+  （下面为 (m + 1) * (n + 1)的矩阵A，A\[i]\[j]表示`match(s, i, p, j)`被执行的次数）
+
+  ```
+  i = 0  1 0 1 0 1 0 1 0 0 0 0 0 
+  i = 1  1 0 2 0 3 0 3 1 0 0 0 0 
+  i = 2  1 0 3 0 6 0 6 3 1 0 0 0 
+  i = 3  1 0 4 0 10 0 10 6 3 1 0 0 
+  i = 4  1 0 5 0 15 0 15 10 6 3 1 0 
+  i = 5  1 0 6 0 21 0 21 15 10 6 3 1 
+  ```
+
+  1 + 3 + 6 + 10 + ... + m(m+1)/2 = m(m + 1)(m + 2) / 6 = O(m<sup>3</sup>)
+
+  大致估计这种情况下的时间复杂度为 O(nm<sup>3</sup>)
+
+- 空间复杂度：Θ(1)
+
+## ※法二：动态规划
+
+```java
+class Solution {
+    public boolean isMatch(String s, String p) {
+        int m = s.length();
+        int n = p.length();
+        boolean[][] dp = new boolean[m + 1][n + 1];
+        dp[0][0] = true;
+        for (int i = 0; i < m + 1; i++) {
+            for (int j = 1; j < n + 1; j++) {
+                if (p.charAt(j - 1) == '*') {
+                    if (matches(s, i - 1, p, j - 2)) {
+                        dp[i][j] = dp[i - 1][j] || dp[i][j - 2];
+                    } else {
+                        dp[i][j] = dp[i][j - 2];
+                    }
+                } else if (matches(s, i - 1, p, j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    private boolean matches(String s, int i, String p, int j) {
+        if (i == -1) {
+            return false;
+        }
+        return s.charAt(i) == p.charAt(j) || p.charAt(j) == '.';
+    }
+}
+```
+
+- 时间复杂度：Θ(mn)
+- 空间复杂度：Θ(mn)
+
+# 11. 盛最多水的容器
+
+## 双指针法
+
+设置两个指针分别位于容器两壁，即`i = 0`, `j = n - 1`，此时容器的容量为`(j - i) * Math.min(h[i], h[j])`。
+
+假设`h[i] < h[j]`，易知，以`h[i]`为左边界的容器，容量均小于当前容器的容量。（因为容器的短板长度一定<=`h[i]`，而容器宽度不可能变长）
+
+<img src="images/image-20210610155406017.png" alt="image-20210610155406017" style="zoom: 67%;" />
+
+所以，要寻找比当前容量更大的容器，应该向内移动高度较小的边界，即将左边界向右移，或将有边界向左移。
+
+```java
+class Solution {
+    public int maxArea(int[] height) {
+        int res = 0;
+        for (int i = 0, j = height.length - 1; i < j; ) {
+            // i++ : 先返回 i，再执行 i = i + 1
+            int minHeight = height[i] < height[j] ? height[i++] : height[j--];
+            int s = (j - i + 1) * minHeight;
+            res = Math.max(res, s);
+        }
+        return res;
+    }
+}
+```
+
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(1)
 
 # 78. 子集
 
