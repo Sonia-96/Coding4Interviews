@@ -1,6 +1,6 @@
 | 题目                                                        | 难度 | 知识点                     |
 | ----------------------------------------------------------- | ---- | -------------------------- |
-| 1. 两数之和                                                 | 简单 |                            |
+| 1. 两数之和                                                 | 简单 | 哈希                       |
 | [2. 两数相加](#2. 两数相加)                                 | 中等 |                            |
 | [3. 无重复字符的最长子串](#3. 无重复字符的最长子串)         | 中等 | 动态规划；滑动窗口；双指针 |
 | [4. 寻找两个正序数组的中位数](#4. 寻找两个正序数组的中位数) | 困难 | 二分查找                   |
@@ -8,11 +8,34 @@
 | [78. 子集](#78. 子集)                                       | 中等 | 位操作；DFS；回溯法        |
 | 10. 正则表达式匹配                                          | 困难 | 递归；动态规划             |
 | 11. 盛最多水的容器                                          | 中等 | 双指针法                   |
+| 15. 三数之和                                                | 中等 | 双指针法                   |
+|                                                             |      |                            |
+|                                                             |      |                            |
 |                                                             |      |                            |
 
 刷题网站：https://leetcode-cn.com/problem-list/2cktkvj/
 
 注：标注“※”的方法时间效率上高于同一题目的其它方法。
+
+# 1. 两数之和
+
+## 哈希
+
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        // key: num, value: index
+        Map<Integer, Integer> hashtable = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (hashtable.containsKey(target - nums[i])) {
+                return new int[] {hashtable.get(target - nums[i]), i};
+            }
+            hashtable.put(nums[i], i);
+        }
+        return null;
+    }
+}
+```
 
 
 
@@ -607,7 +630,7 @@ class Solution {
 
   例如：s="aaaaa", p="a\*a\*a\*a\*aaaaa"，此时，match(s, i, p, j)被执行的次数为：
 
-  （下面为 (m + 1) * (n + 1)的矩阵A，A\[i]\[j]表示`match(s, i, p, j)`被执行的次数）
+  （下面为 (m + 1) * (n + 1)的矩阵A，A\[i]\[j]表示`match(s, i, p, j)`被执行的次数）（代码详见q10_timeAnalysis.java)
 
   ```
   i = 0  1 0 1 0 1 0 1 0 0 0 0 0 
@@ -690,6 +713,53 @@ class Solution {
 
 - 时间复杂度：Θ(N)
 - 空间复杂度：Θ(1)
+
+# 15. 三数之和
+
+## 双指针法
+
+- 为了避免结果中有**重复**的三元组(a, b, c) ，首先要将`nums`按由小到大排序，并且避免元素的重复出现。
+- 然后，可以用**三重循环**列举处所有可能情况，但是这样会造成TLE，因此要对三重循环进行优化。
+- 已知第一个元素为a，则后两个元素的和一定为-a，此时可将问题转化为求解**两数之和**。由于该数组已经排序好了，可以用**双指针法**在Θ(N)内解决问题（具体分析请看[这里](https://leetcode-cn.com/problems/3sum/solution/san-shu-zhi-he-by-leetcode-solution/)）。如此，便将后两重循环的时间复杂度从Θ(N<sup>2</sup>)降到Θ(N)。
+
+```java
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> res = new ArrayList<>();
+        // 枚举第一个元素
+        for (int i = 0; i < nums.length; i++) {
+            // 避免第一个元素重复
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int target = -nums[i], k = nums.length - 1;
+            // 枚举第二个元素
+            for (int j = i + 1; j < nums.length; j++) {
+                // 避免第二个元素重复
+                if (j > i + 1 && nums[j] == nums[j - 1]) {
+                    continue;
+                }
+                while (j < k && nums[j] + nums[k] > target) {
+                    k -= 1;
+                }
+                if (j == k) {
+                    break;
+                }
+                if (nums[j] + nums[k] == target) {
+                    res.add(new ArrayList<>(Arrays.asList(nums[i], nums[left], nums[right])));
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
+- 时间复杂度：Θ(N<sup>2</sup>)
+- 空间复杂度：Θ(logN)。java的sort()函数用了快速排序和归并排序。快排需要的额外的空间为Θ(logN)（递归栈），归并排序需要的额外的空间为Θ(N) + Θ(logN)（递归栈）。
+
+
 
 # 78. 子集
 
