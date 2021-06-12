@@ -12,23 +12,28 @@
 
 ## 1863. 找出所有子集的异或总和再求和
 
+异或（^）位操作：值不同为1，相同为0
+
+- 满足交换律和结合律
+
+- x ^ 0 = x, x ^ x = 1
+- a ^ b ^ b = a ^ 0 = a
+
 ### 法一：二进制模拟
 
 ```java
-public Solution {
+class Solution {
     public int subsetXORSum(int[] nums) {
-        int res = 0;
         int n = 1 << nums.length;
+        int res = 0;
         for (int i = 0; i < n; i++) {
-            int curr = 0;
-            int index = i;
-            for (int j = 0; j < nums.length; j++) {
-                if ((index & 1) == 1) {
-                    curr = curr ^ nums[j];
+            int subset = 0;
+            for (int idx = i, j = 0; idx > 0; idx >>= 1, j++) {
+                if ((idx & 1) == 1) {
+                    subset ^= nums[j];
                 }
-                index = index >> 1;
             }
-            res += curr;
+            res += subset;
         }
         return res;
     }
