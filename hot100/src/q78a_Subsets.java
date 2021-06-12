@@ -10,11 +10,10 @@ public class q78a_Subsets {
         for (int i = 0; i < n; i++) {
             List<Integer> subset = new ArrayList<>();
             int index = i;
-            for (int j = 0; j < length; j++) {
-                if ((index & 1 )== 1) {
+            for (int idx = i, j = 0; idx > 0; idx >>= 1, j++) {
+                if ((idx & 1) == 1) {
                     subset.add(nums[j]);
                 }
-                index >>= 1;
             }
             res.add(subset);
         }
