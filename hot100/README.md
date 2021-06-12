@@ -880,3 +880,28 @@ class Solution {
     }
 }
 ```
+
+==对比：下面的代码为什么报错？==
+
+```java
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    List<Integer> subset = new ArrayList<>();
+
+    public List<List<Integer>> subsets(int[] nums) {
+        backtrack(nums, 0);
+        return res;
+    }
+
+    private void backtrack(int[] nums, int i) {
+        res.add(new ArrayList(subset));
+        subset.add(nums[i]);
+        for (int j = i + 1; j < nums.length; j++) {
+            backtrack(nums, j);
+            subset.remove(subset.size() - 1);
+        }
+    }
+}
+```
+
+答：回溯法末端的子集没有放入res中
