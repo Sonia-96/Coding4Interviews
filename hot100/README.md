@@ -761,6 +761,45 @@ class Solution {
 
 
 
+# 17. 电话号码的字母组合
+
+## 回溯法
+
+看到这道题我立马想到用多重循环，但是由于`digits`的个数不定，所以要实现一个**不定重数的多重循环**，这就要用**递归**辅助实现了。[LeetCode官方题解](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/solution/dian-hua-hao-ma-de-zi-mu-zu-he-by-leetcode-solutio/)和我一样，不过他们把这称为**“回溯法**”，想来确实没错。所以回溯法本质是一种更智能的多重循环吧，这里的“智能”是指可以剪枝、重数不定等。
+
+<img src="images/image-20210612155757935.png" alt="17.电话号码的字母组合 图解" style="zoom:67%;" />
+
+```java
+class Solution {
+    String[] map = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+    List<String> res = new ArrayList<>();
+
+    public List<String> letterCombinations(String digits) {
+        if (digits.length() == 0) {
+            return res;
+        }
+        recursion(digits, 0, new StringBuilder());
+        return res;
+    }
+
+    private void recursion(String digits, int i, StringBuilder cur) {
+        if (i == digits.length()) {
+            res.add(cur.toString());
+            return;
+        }
+        String letters = map[Character.getNumericValue(digits.charAt(i))];
+        for (int j = 0; j < letters.length(); j++) {
+            cur.append(letters.charAt(j));
+            recursion(digits, i + 1, cur);
+            cur.deleteCharAt(i);
+        }
+    }
+}
+```
+
+- 时间复杂度：O(3<sup>m</sup> 4<sup>n</sup>)，其中n为数字7和9在输入中出现的次数，m为其它数字出现的次数。
+- 空间复杂度：Θ(m + n)（递归调用层数）
+
 # 78. 子集
 
 给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
