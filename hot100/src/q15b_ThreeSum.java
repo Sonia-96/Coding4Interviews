@@ -10,7 +10,7 @@ public class q15b_ThreeSum {
         Arrays.sort(nums);
         List<List<Integer>> res = new ArrayList<>();
         // 枚举第一个元素
-        for (int i = 0; i < nums.length; i++) {
+        for (int i = 0; i < nums.length - 2; i++) {
             // 避免第一个元素重复
             if (i > 0 && nums[i] == nums[i - 1]) {
                 continue;
