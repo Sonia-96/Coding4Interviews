@@ -9,9 +9,9 @@
 | 10. 正则表达式匹配                                          | 困难 | 递归；动态规划             |
 | 11. 盛最多水的容器                                          | 中等 | 双指针法                   |
 | 15. 三数之和                                                | 中等 | 双指针法                   |
-|                                                             |      |                            |
-|                                                             |      |                            |
-|                                                             |      |                            |
+| 17. 电话号码的字母组合                                      | 中等 | 回溯                       |
+| 19. 删除链表的倒数第k个结点                                 | 中等 | 链表                       |
+| 200. 岛屿数量                                               | 中等 | 连通区；DFS；BFS；并查集   |
 
 刷题网站：https://leetcode-cn.com/problem-list/2cktkvj/
 
@@ -367,8 +367,6 @@ $$
 上面的“边界情况”指的是P(i, i) 或P(i, i + 1），这里我们称为“回文中心”。因此，这个算法也叫做“中心扩展法”。
 
 对应下图中，状态转移链即为从`(i, i)` 或`(i, i + 1)`沿着对角线从左下到右上逐步计算回文长度。
-
-注意：如果`P(i, j)`为非回文，则不必继续计算`P(i + 1, j - 1)`及之后的情况，因为它们一定为非回文。
 
 <img src="C:\Users\Sonia\AppData\Roaming\Typora\typora-user-images\image-20210511154603366.png" alt="image-20210511154603366" style="zoom:33%;" />
 
@@ -800,6 +798,131 @@ class Solution {
 - 时间复杂度：O(3<sup>m</sup> 4<sup>n</sup>)，其中n为数字7和9在输入中出现的次数，m为其它数字出现的次数。
 - 空间复杂度：Θ(m + n)（递归调用层数）
 
+
+
+`StringBuilder`的常用方法：
+
+- append()
+- delete(int start, int end)
+- deleteCharAt(int i)
+- toString()
+- substring(int start [, int end])
+
+# 19. 删除链表的倒数第k个结点
+
+## 法一：计算链表长度
+
+- 在头结点前添加一个**哨兵结点（sentinel）/哑结点（dummy node）**，作为头结点的前驱结点。这样就无需对头结点做特殊判断了
+- 第一次遍历链表，得到链表长度`size`
+- 第二次遍历链表，找到下标为`size - n `的结点，此即待删除的结点
+
+```java
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode sentinel = new ListNode(0, head);
+        int size = getSize(head);
+        ListNode p = sentinel;
+        for (int i = 0; i < size - n; i++) {
+            p = p.next;
+        }
+        p.next = p.next.next;
+        return sentinel.next;
+    }
+
+    private int getSize(ListNode head) {
+        int size = 0;
+        while (head != null) {
+            size += 1;
+            head = head.next;
+        }
+        return size;
+    }
+}
+```
+
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(1)
+
+## 法二：栈
+
+在遍历链表的同时将所有结点依次如栈，根据“后进先出”的原则，弹出栈的第n个结点即为待删除的结点，而此时栈顶的结点即为其前驱结点。
+
+```java
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        Stack<ListNode> stack = new Stack<>();
+        ListNode sentinel = new ListNode(0, head);
+        ListNode p = sentinel;
+        while (p != null) {
+            stack.push(p);
+            p = p.next;
+        }
+        for (int i = 0; i < n; i++) {
+            stack.pop();
+        }
+        ListNode pre = stack.pop();
+        pre.next = pre.next.next;
+        return sentinel.next;
+    }
+}
+```
+
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(N)
+
+### 小结：栈的实现
+
+1. `LinkedList`——双向链表实现
+
+   - 法一：
+     - add()：添加元素至末尾
+     - removeLast(): 删除末尾的元素
+     - getLast(): 获取尾部的元素（即栈顶元素）
+   - 法二：
+     - push(): 添加结点至头部
+     - pop()：删除头部结点
+     - getFirst() / peek()：获取头部元素（即栈顶元素）
+
+   注：LinkedList还可以用于实现**队列**
+
+   - add(): 添加元素至末尾
+   - remove(): 删除队尾元素
+   - getFirst()：获取队首元素
+
+2. `Stack`——数组实现
+
+   - push(E item)
+   - pop()
+   - peek()
+   - empty(): 该栈是否为空
+
+## 法三：双指针
+
+设置两个指针`p1`和`p2`。一开始，`p1`和`p2`均指向哨兵结点；然后，`p2`先前行`n`步；再接着，`p1`和`p2`同步走。当`p2`走到尾结点时，`p1`即指向待删除结点的前驱结点。
+
+```java
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode sentinel = new ListNode(0, head);
+        ListNode p1 = sentinel, p2 = sentinel;
+        for (int i = 0; i < n; i++) {
+            p2 = p2.next;
+        }
+        while (p2.next != null) {
+            p2 = p2.next;
+            p1 = p1.next;
+        }
+        p1.next = p1.next.next;
+        return sentinel.next;
+    }
+}
+```
+
+- 时间复杂度：Θ(N)
+- 空间复杂度：Θ(1)
+
+
+
 # 78. 子集
 
 给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
@@ -853,7 +976,7 @@ class Solution {
 **笔记：**
 
 - 1 << n = 100...00 （共n个0）= 2 <sup>n</sup>
-- n >> 1：将二进制数的各位全部右移1位。例如，1111 >> 1 后变为 0111
+- n >> 1：n / 2
 - n & 1可判断n的奇偶性
   - n & 1 == 1，则n为奇数
   - n & 1 == 0，则n为偶数
@@ -943,4 +1066,208 @@ class Solution {
 }
 ```
 
-答：回溯法末端的子集没有放入res中
+答：递归栈末端的子集没有放入res中
+
+# 200. 岛屿数量
+
+求岛屿数量，就相当于求连通区数量。
+
+- 记录访问过的结点：一种方法是新建一个布尔数组，另一种方法是直接把访问过的'1'变为'0'
+- ==注意==：在将坐标(i, j)压缩至一维时，首先要判断(i, j)是否满足行和列的要求。例如，对4*5的矩阵，数字10既可以对应(1, 5)，也可以对应(2, 0)，但显然前者不在矩阵内。
+
+## ※法一：DFS
+
+```java
+class Solution {
+    public int numIslands(char[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        int num = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == '1') {
+                    dfs(grid, i, j);
+                    num += 1;
+                }
+            }
+        }
+        return num;
+    }
+
+    private void dfs(char[][] grid, int i, int j) {
+        int m = grid.length, n = grid[0].length;
+        if (i < 0 || j < 0 || i >= m || j >= n || grid[i][j] == '0') {
+            return;
+        }
+        grid[i][j] = '0'; // 标记该元素已被访问过
+        dfs(grid, i - 1, j);
+        dfs(grid, i + 1, j);
+        dfs(grid, i, j - 1);
+        dfs(grid, i, j + 1);
+    }
+}
+```
+
+- 时间复杂度：Θ(mn)
+- 空间复杂度：O(mn)。在最坏情况下，整个网格皆为陆地，dfs的调用栈的深度达到mn
+
+## 法二：BFS
+
+```java
+class Solution {
+    public int numIslands(char[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        Queue<Integer> queue = new LinkedList<>();
+        int num = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == '1') {
+                    queue.add(i * n + j);
+                    while (!queue.isEmpty()) {
+                        int p = queue.remove();
+                        int row = p / n;
+                        int col = p % n;
+                        put(grid, queue, row - 1, col);
+                        put(grid, queue, row + 1, col);
+                        put(grid, queue, row, col - 1);
+                        put(grid, queue, row, col + 1);
+                    }
+                    num += 1;
+                }
+            }
+        }
+        return num;
+    }
+
+    private void put(char[][] grid, Queue<Integer> queue, int i, int j) {
+        int m = grid.length, n = grid[0].length;
+        if (i < 0 || j < 0 || i >= m || j >= n || grid[i][j] == '0') {
+            return;
+        }
+        grid[i][j] = '0';
+        queue.add(i * n + j);
+    }
+}
+```
+
+- 时间复杂度：Θ(mn)
+- 空间复杂度：O(min(m, n))
+
+## 法三：并查集
+
+并查集的一大应用就是计算无向图中的连通区数量。
+
+```java
+class Solution {
+    public int numIslands(char[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        UnionFind uf = new UnionFind(grid);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == '1') {
+                    grid[i][j] = '0';
+                    if (i - 1 >= 0 && grid[i - 1][j] == '1') {
+                        uf.union(i * n + j, (i - 1) * n + j);
+                    }
+                    if (i + 1 < m && grid[i + 1][j] == '1') {
+                        uf.union(i * n + j, (i + 1) * n + j);
+                    }
+                    if (j - 1 >= 0 && grid[i][j - 1] == '1') {
+                        uf.union(i * n + j, i * n + j - 1);
+                    }
+                    if (j + 1 < n && grid[i][j + 1] == '1') {
+                        uf.union(i * n + j, i * n + j + 1);
+                    }
+                }
+            }
+        }
+        return uf.getCount();
+    }
+
+    private class UnionFind {
+        int[] parent;
+        int count = 0;
+
+        private UnionFind(char[][] grid) {
+            int m = grid.length, n = grid[0].length;
+            // 负值表示该结点为根节点，其绝对值为该并查集树的size
+            parent = new int[m * n];
+            Arrays.fill(parent, -1);
+            // count初始化，每一个格子‘1’为一块单独的岛屿
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (grid[i][j] == '1') {
+                        count += 1;
+                    }
+                }
+            }
+        }
+
+        private int find(int v) {
+            int root = v;
+            while (parent[root] >= 0) {
+                root = parent[root];
+            }
+            // 路径压缩
+            while (v != root) {
+                int next = parent[v];
+                parent[v] = root;
+                v = next;
+            }
+            return root;
+        }
+
+        private int getSize(int v) {
+            return -parent[find(v)];
+        }
+
+        private void union(int v1, int v2) {
+            int root1 = find(v1);
+            int root2 = find(v2);
+            if (root1 != root2) {
+                int size1 = getSize(root1);
+                int size2 = getSize(root2);
+                if (size1 < size2) {
+                    parent[root1] = root2;
+                    parent[root2] -= size1;
+                } else {
+                    parent[root2] = root1;
+                    parent[root1] -= size2;
+                }
+                count -= 1;
+            }
+        }
+
+        private int getCount() {
+            return count;
+        }
+    }
+}
+```
+
+- 时间复杂度：Θ(mn)
+- 空间复杂度：O(mn)
+
+# 392. 判断子序列
+
+## 贪心策略+双指针
+
+假设字符`s[i]`在`t`中出现的位置有x1 < x2，那么取x1是最优解，因为在x2后能取到的字符在x1后也能取到。所以，在匹配字符`s[i]`时，选取`t`中相等字符中最靠前的下标，记作x1；接着匹配s[i+1]时，就从下标x1+1开始继续匹配。
+
+```java
+class Solution {
+    public boolean isSubsequence(String s, String t) {
+        int i = 0, j = 0;
+        while (i < s.length() & j < t.length()) {
+            if (s.charAt(i) == t.charAt(j)) {
+                i++;
+            }
+            j++;
+        }
+        return i == s.length();
+    }
+}
+```
+
+- 时间复杂度：O(n + m)
+- 空间复杂度：O(1)
+
