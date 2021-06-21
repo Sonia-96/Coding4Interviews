@@ -29,10 +29,9 @@ public class q200b_CountSubIslands {
 
     private void put(char[][] grid, Queue<Integer> queue, int i, int j) {
         int m = grid.length, n = grid[0].length;
-        if (i < 0 || j < 0 || i >= m || j >= n || grid[i][j] == '0') {
-            return;
+        if (i >= 0 && i < m && j >= 0 && j < n && grid[i][j] == '1') {
+            grid[i][j] = '0';
+            queue.add(i * n + j);
         }
-        grid[i][j] = '0';
-        queue.add(i * n + j);
     }
 }

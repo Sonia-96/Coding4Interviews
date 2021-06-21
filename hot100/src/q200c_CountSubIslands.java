@@ -36,27 +36,25 @@ public class q200c_CountSubIslands {
 
         private UnionFind(char[][] grid) {
             int m = grid.length, n = grid[0].length;
-            // parent同时记录父结点（非负数）和集合的size（负数）
+            // 负值表示该结点为根节点，其绝对值为该并查集树的size
             parent = new int[m * n];
             Arrays.fill(parent, -1);
+            // count初始化，每一个格子‘1’为一块单独的岛屿
             for (int i = 0; i < m; i++) {
                 for (int j = 0; j < n; j++) {
-                    if(grid[i][j] == '1') {
+                    if (grid[i][j] == '1') {
                         count += 1;
                     }
                 }
             }
         }
 
-        private int getCount() {
-            return count;
-        }
-
         private int find(int v) {
             int root = v;
-            while (parent[root] > 0) {
+            while (parent[root] >= 0) {
                 root = parent[root];
             }
+            // 路径压缩
             while (v != root) {
                 int next = parent[v];
                 parent[v] = root;
@@ -65,25 +63,29 @@ public class q200c_CountSubIslands {
             return root;
         }
 
-        private int sizeOf(int v) {
-            return -parent[v];
+        private int getSize(int v) {
+            return -parent[find(v)];
         }
 
         private void union(int v1, int v2) {
             int root1 = find(v1);
             int root2 = find(v2);
             if (root1 != root2) {
-                int size1 = sizeOf(root1);
-                int size2 = sizeOf(root2);
-                if (size1 > size2) {
-                    parent[root1] -= size2;
-                    parent[root2] = root1;
-                } else {
-                    parent[root2] -= size1;
+                int size1 = getSize(root1);
+                int size2 = getSize(root2);
+                if (size1 < size2) {
                     parent[root1] = root2;
+                    parent[root2] -= size1;
+                } else {
+                    parent[root2] = root1;
+                    parent[root1] -= size2;
                 }
                 count -= 1;
             }
+        }
+
+        private int getCount() {
+            return count;
         }
     }
 
