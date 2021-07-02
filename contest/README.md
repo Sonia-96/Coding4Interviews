@@ -1,10 +1,12 @@
 [TOC]
 
-| 日期       | #周赛 | 题目                                                         | 解决数 | 排名        |
-| ---------- | ----- | ------------------------------------------------------------ | ------ | ----------- |
-| 2021-05-16 | 241   | [1863. 找出所有子集的异或总和再求和](#1863. 找出所有子集的异或总和再求和)<br>[1864. 构成交替字符串需要的最小交换次数](#1864. 构成交替字符串需要的最小交换次数)<br>1865. 找出和为指定值的下标对<br>1866. 恰有 K 根木棍可以看到的排列数目 | 1/4    | 2627 / 4490 |
-| 2021-05-23 | 242   | 1869. 哪种连续字符串更长<br>1870. 准时到达的列车最小时速<br>[1871. 跳跃游戏VII](#1871. 跳跃游戏VII) | 1/4    | 27096/53593 |
-| 2021-05-30 | 243   | [5772. 检查某单词是否等于两单词之和](#5772. 检查某单词是否等于两单词之和)<br>[5773. 插入后的最大值](#5773. 插入后的最大值)<br>==[5774. 使用服务器处理任务](#5774. 使用服务器处理任务)== | 2/4    | 1593 / 4492 |
+| 日期       | #周赛 | 题目                                                         | 解决数 | 排名                 |
+| ---------- | ----- | ------------------------------------------------------------ | ------ | -------------------- |
+| 2021-05-16 | 241   | [1863. 找出所有子集的异或总和再求和](#1863. 找出所有子集的异或总和再求和)<br>[1864. 构成交替字符串需要的最小交换次数](#1864. 构成交替字符串需要的最小交换次数)<br>1865. 找出和为指定值的下标对<br>1866. 恰有 K 根木棍可以看到的排列数目 | 1/4    | 2627 / 4490（58.5%） |
+| 2021-05-23 | 242   | 1869. 哪种连续字符串更长<br>1870. 准时到达的列车最小时速<br>[1871. 跳跃游戏VII](#1871. 跳跃游戏VII) | 1/4    | 27096/53593（50.5%） |
+| 2021-05-30 | 243   | [5772. 检查某单词是否等于两单词之和](#5772. 检查某单词是否等于两单词之和)<br>[5773. 插入后的最大值](#5773. 插入后的最大值)<br>==[5774. 使用服务器处理任务](#5774. 使用服务器处理任务)== | 2/4    | 1593 / 4492（35.5%） |
+| 2021-06-13 | 245   |                                                              | 1/4    | 2234/4270（54.7%）   |
+| 2021-06-20 | 246   |                                                              | 2/4    | 1700 / 4135（41.1%） |
 
 
 
@@ -178,9 +180,9 @@ public class Solution {
 
 - 速度的上下界：
   - 下界：minV = 1
-  - 上界：maxV = 10<sup>5</sup>/0.01 = 10<sup>7</sup>（因为dist[i] <=10<sup>5</sup>，hour至多两位小数，所以时间最小值为0.01h）
-  - （上下界可继续缩小，不过影响不大）
-- **<u>计算中位数</u>**：midV = minV + (maxV - minV) / 2 （这种写法可以避免minV + maxV造成数值溢出）
+  - 上界：maxV = 10<sup>5</sup>/0.01 = 10<sup>7</sup>（因为dist[i] <=10<sup>5</sup>；hour至多两位小数，所以时间最小值为0.01h）
+  - 上下界可继续缩小，不过影响不大
+- **<u>计算中位数</u>**：midV = minV + (maxV - minV) / 2 （这种写法可以避免minV + maxV造成的数值溢出）
 - 计算midV到达终点所需时间time
   - 对dist[0] ~ dist[n - 2]：由于列车整点发车，所以时间必须取整。<u>**取整有两种方法**</u>:
     - (dist[i] - 1) / midV + 1
@@ -211,7 +213,7 @@ public class Solution {
         int minV = 1;
         int maxV = 10000000;
         while (minV < maxV) {
-            int midV = (minV + maxV) / 2;
+            int midV = minV + (maxV - minV) / 2;
             double time = getTime(dist, midV);
             if (time <= hour) {
                 maxV = midV;
@@ -242,7 +244,7 @@ public class Solution {
 
 
 
-## [1871. 跳跃游戏VII](https://leetcode-cn.com/problems/jump-game-vii/)
+## 1871. 跳跃游戏VII
 
 ### 法一：动态规划
 
@@ -489,3 +491,222 @@ class Solution {
 
 
 
+# 周赛#245
+
+## 1898. 可移除字符的最大数目
+
+### 二分查找右边界+子序列判断
+
+- 观察：如果移除`removable`的前k+1个元素后，`p`仍然是`s`的子序列，那么，只移除前k个元素，`p`也一定是`s`的子序列。
+- 使用二分查找可找到k的最大值，时间复杂度Θ(logN)
+- 对每一个k值，都要判断`p`是否为`s`的子序列，时间复杂度Θ(N)【参考leetcode392.判断子序列】
+- 总的时间复杂度：Θ(NlogN)
+
+```java
+class Solution {
+    public int maximumRemovals(String s, String p, int[] removable) {
+        int left = 0, right = removable.length;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (check(s, p, removable, mid)) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return left - 1;
+    }
+
+    private boolean isSubsequence(String s, String p, int[] removable, int k) {
+        boolean[] removed = new boolean[s.length()];
+        for (int i = 0; i < k; i++) {
+            removed[removable[i]] = true;
+        }
+        int i = 0, j = 0;
+        while (i < s.length() && j < p.length()) {
+            if (!removed[i] && s.charAt(i) == p.charAt(j)) {
+                j++;
+            }
+            i++;
+        }
+        return j == p.length();
+    }
+}
+```
+
+### 总结：二分查找的两种写法
+
+左闭右开是指变量的取值范围为[left, right)，左闭右闭是指变量的取值范围为[left, right]
+
+|          | left初始值 | right初始值 | 循环条件      | left更新 | right更新 |
+| -------- | ---------- | ----------- | ------------- | -------- | --------- |
+| 左闭右闭 | 0          | n - 1       | left <= right | left + 1 | right - 1 |
+| 左闭右开 | 0          | n           | left < right  | left + 1 | right     |
+
+在这一题中，我采用的是“左闭右闭”，另外，因为查找的是右边界，所以最后return left - 1。
+
+# 周赛#246
+
+## 1903. 字符串中最大的奇数
+
+本题采用贪心策略解答。
+
+- 数字的奇偶性只与其末位数字有关。另外，位数越多，数字越大，因此，最后返回的字符串起始下标一定是0。
+- 要使位数最多，就要使字符串最长，因此，找到字符串中**最靠右**的奇数，记其下标为end，则字符串中的最大奇数为s[0...end]。
+
+```java
+class Solution {
+    public String largestOddNumber(String num) {
+        int end = 0;
+        // 从右到左遍历，找到第一个奇数即可返回
+        for (int i = num.length() - 1; i >= 0 ; i--) {
+            if ((num.charAt(i) & 1) == 1) {
+                end = i + 1;
+                break;
+            }
+        }
+        return num.substring(0, end);
+    }
+}
+```
+
+知识点：0~1的字符的ASCII码值与对应的数字奇偶性相同。可用下面的代码验证：
+
+```java
+for (int i = 0; i < 10; i++) {
+    int tmp = (int) Character.forDigit(i, 10);
+    if ((tmp & 1) != (i & 1)) {
+        System.out.println("0~9的字符与其ASCII码值奇偶性不一定相同！");
+        break;
+    }
+}
+System.out.println("0~9的字符与其ASCII码值奇偶性相同！");
+```
+
+
+
+## 1904. 你完成的完整对局数
+
+比赛的时候做出来了，但是代码很复杂，下面这个是改进版。
+
+```java
+class Solution {
+    public int numberOfRounds(String startTime, String finishTime) {
+        int start = toMinutes(startTime);
+        int finish = toMinutes(finishTime);
+        finish += finish < start ? 1440 : 0;
+        finish = finish / 15 * 15; // 第一个<=finishTime的完整对局结束的时间
+        return (finish - start) / 15;
+    }
+
+    private int toMinutes(String time) {
+        int h = Integer.parseInt(time.substring(0, 2));
+        int min = Integer.parseInt(time.substring(3, 5));
+        return h * 60 + min;
+    }
+}
+```
+
+
+
+## 1905. 统计子岛屿
+
+- 判断岛屿：DFS / BFS
+- 判断子岛屿：grid2中的岛屿的**每一个**格子在grid1中均为1【就是这里没有想到！！】
+
+### 法一：DFS
+
+```java
+class Solution {
+    public int countSubIslands(int[][] grid1, int[][] grid2) {
+        int m = grid1.length, n = grid1[0].length;
+        int count = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid2[i][j] == 1) {
+                    if(dfs(grid1, grid2, i, j)) {
+                        count += 1;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    private boolean dfs(int[][] grid1, int[][] grid2, int i, int j) {
+        int m = grid1.length, n = grid1[0].length;
+        if (i < 0 || j < 0 || i >= m || j >= n || grid2[i][j] == 0) {
+            return true;
+        }
+        grid2[i][j] = 0;
+        boolean up = dfs(grid1, grid2, i - 1, j);
+        boolean down = dfs(grid1, grid2, i + 1, j);
+        boolean left = dfs(grid1, grid2, i, j - 1);
+        boolean right = dfs(grid1, grid2, i, j + 1);
+        return grid1[i][j] == 1 && (up & down & left & right);
+    }
+}
+```
+
+- 在判断语句中，`&&` 和 `&`的区别
+  - `&`左右两侧的式子都必须运算
+  - `&&`具有短路的功能，如果其左侧的式子返回`false`，则不再对右侧的式子进行运算。所以`&&`的效率更高
+
+### 法二：BFS
+
+```java
+class Solution {
+    public int countSubIslands(int[][] grid1, int[][] grid2) {
+        int m = grid1.length, n = grid1[0].length;
+        int count = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid2[i][j] == 1) {
+                    count += bfs(grid1, grid2, i , j) ? 1 : 0;
+                }
+            }
+        }
+        return count;
+    }
+
+    private boolean bfs(int[][] grid1, int[][] grid2, int i, int j) {
+        grid2[i][j] = 0;
+        int m = grid1.length, n = grid1[0].length;
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(i * n + j);
+        boolean check = grid1[i][j] == 1;
+        while (!queue.isEmpty()) {
+            int p = queue.remove();
+            int row = p / n, col = p % n;
+            if (row - 1 >= 0 && grid2[row - 1][col] == 1) {
+                grid2[row - 1][col] = 0;
+                queue.add((row - 1) * n + col);
+                check &= grid1[row - 1][col] == 1;
+            }
+            if (row + 1 < m && grid2[row + 1][col] == 1) {
+                grid2[row + 1][col] = 0;
+                queue.add((row + 1) * n + col);
+                check &= grid1[row + 1][col] == 1;
+            }
+            if (col - 1 >= 0 && grid2[row][col - 1] == 1) {
+                grid2[row][col - 1] = 0;
+                queue.add(row * n + col - 1);
+                check &= grid1[row][col - 1] == 1;
+            }
+            if (col + 1 < n && grid2[row][col + 1] == 1) {
+                grid2[row][col + 1] = 0;
+                queue.add(row * n + col + 1);
+                check &= grid1[row][col + 1] == 1;
+            }
+        }
+        return check;
+    }
+}
+```
+
+注意：区分两种更新check的方式：
+
+- 法一：check = gird1\[i]\[j] == 1
+- 法二：check = check & gird1\[i]\[j] == 1
+
+法一的check值只由岛屿中最后一个格子决定；而法二中，只要岛屿中任一格子对应的grid1不为1，check就为false。所以法二是正确的。
