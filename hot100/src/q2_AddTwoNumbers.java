@@ -55,8 +55,7 @@ public class q2_AddTwoNumbers {
                 l2 = l2.next;
             }
             carry = sum / 10;
-            sum = sum % 10;
-            p.next = new ListNode(sum);
+            p.next = new ListNode(sum % 10);
             p = p.next;
         }
         return head.next;

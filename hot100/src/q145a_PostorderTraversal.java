@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class q145a_PostTraversal {
+public class q145a_PostorderTraversal {
     class TreeNode {
         public int val;
         public TreeNode left;

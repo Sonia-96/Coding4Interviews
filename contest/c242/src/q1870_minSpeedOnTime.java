@@ -10,7 +10,7 @@ public class q1870_minSpeedOnTime {
         int minV = 1;
         int maxV = 10000000;
         while (minV < maxV) {
-            int midV = (minV + maxV) / 2;
+            int midV = minV + (maxV - minV) / 2;
             double time = getTime(dist, midV);
             if (time <= hour) {
                 maxV = midV;

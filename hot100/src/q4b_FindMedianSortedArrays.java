@@ -18,17 +18,15 @@ public class q4b_FindMedianSortedArrays {
         double curr = 0;
         for (int i = 0; i < k; i++) {
             if (p1 == nums1.length) {
-                return nums2[p2 + k - i - 1];
+                return nums2[k - p1 - 1];
             }
             if (p2 == nums2.length) {
-                return nums1[p1 + k - i - 1];
+                return nums1[k - p2 - 1];
             }
             if (nums1[p1] < nums2[p2]) {
-                curr = nums1[p1];
-                p1 += 1;
+                curr = nums1[p1++];
             } else {
-                curr = nums2[p2];
-                p2 += 1;
+                curr = nums2[p2++];
             }
         }
         return curr;

@@ -1,3 +1,4 @@
+# 目录
 | 题目                                                        | 难度 | 知识点                     |
 | ----------------------------------------------------------- | ---- | -------------------------- |
 | 1. 两数之和                                                 | 简单 | 哈希                       |
@@ -5,13 +6,19 @@
 | [3. 无重复字符的最长子串](#3. 无重复字符的最长子串)         | 中等 | 动态规划；滑动窗口；双指针 |
 | [4. 寻找两个正序数组的中位数](#4. 寻找两个正序数组的中位数) | 困难 | 二分查找                   |
 | [5. 最长回文子串](#5. 最长回文子串)                         | 中等 | 动态规划及其优化           |
-| [78. 子集](#78. 子集)                                       | 中等 | 位操作；DFS；回溯法        |
 | 10. 正则表达式匹配                                          | 困难 | 递归；动态规划             |
 | 11. 盛最多水的容器                                          | 中等 | 双指针法                   |
 | 15. 三数之和                                                | 中等 | 双指针法                   |
 | 17. 电话号码的字母组合                                      | 中等 | 回溯                       |
 | 19. 删除链表的倒数第k个结点                                 | 中等 | 链表                       |
+| 20. 有效的括号                                              | 简单 | 栈                         |
+| 21. 合并两个链表                                            | 简单 | ==递归==；哨兵结点         |
+| [78. 子集](#78. 子集)                                       | 中等 | 位操作；DFS；回溯法        |
+| 96. 不同的二叉搜索树                                        | 中等 | 动态规划                   |
+| 102. 二叉树的层序遍历                                       | 中等 | 二叉树；BFS                |
 | 200. 岛屿数量                                               | 中等 | 连通区；DFS；BFS；并查集   |
+| 392. 判断子序列                                             | 简单 | 贪心策略                   |
+| 767. 重构字符串                                             | 中等 | 贪心策略；最大堆           |
 
 刷题网站：https://leetcode-cn.com/problem-list/2cktkvj/
 
@@ -37,8 +44,6 @@ class Solution {
 }
 ```
 
-
-
 # 2. 两数加和
 
 ```java
@@ -57,8 +62,7 @@ class Solution {
                 l2 = l2.next;
             }
             carry = sum / 10;
-            sum = sum % 10;
-            p.next = new ListNode(sum);
+            p.next = new ListNode(sum % 10);
             p = p.next;
         }
         return root.next;
@@ -330,7 +334,7 @@ class Solution {
             return s;
         }
         boolean[][] dp = new boolean[s.length()][s.length()];
-        for (int i = 0; i < s.length(); i++) { //所有长度为1的子串都是回文子串
+        for (int i = 0; i < s.length(); i++) { // 所有长度为1的子串都是回文子串
             dp[i][i] = true;
         }
         int maxLen = 1, start = 0;
@@ -921,6 +925,82 @@ class Solution {
 - 时间复杂度：Θ(N)
 - 空间复杂度：Θ(1)
 
+# 20. 有效的括号
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(' || c == '[' || c == '{') {
+                stack.push(s.charAt(i));
+            } else {
+                if (stack.empty()) {
+                    return false;
+                }
+                char pre = stack.pop();
+                if ((c == ')' && pre != '(') || (c == ']' && pre != '[') || (c == '}' && pre != '{')  ) {
+                    return false;
+                }
+            }
+        }
+        return stack.empty();
+    }
+}
+```
+
+
+
+# 21. 合并两个链表
+
+## 法一：迭代
+
+虽然题目很简单，但是官方题解的代码还是有值得学习的地方。
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode sentinel = new ListNode(-101); 
+        ListNode p1 = l1, p2 = l2, p = sentinel;
+        while (p1 != null & p2 != null) {
+            if (p1.val <= p2.val) {
+                p.next = p1; // 学习，不用新建结点，直接修改指针
+                p1 = p1.next;
+            } else {
+                p.next = p2;
+                p2 = p2.next;
+            }
+            p = p.next;
+        }
+        p.next = p1 == null ? p2 : p1; //学习
+        return sentinel.next;
+    }
+}
+```
+
+## 法二：递归
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null) {
+            return l2;
+        }
+        if (l2 == null) {
+            return l1;
+        }
+        if (l1.val <= l2.val) {
+            l1.next = mergeTwoLists(l1.next, l2);
+            return l1;
+        } else {
+            l2.next = mergeTwoLists(l1, l2.next);
+            return l2;
+        }
+    }
+}
+```
+
 
 
 # 78. 子集
@@ -1067,6 +1147,84 @@ class Solution {
 ```
 
 答：递归栈末端的子集没有放入res中
+
+# 96. 不同的二叉搜索树
+
+## 动态规划
+
+- 记G(n)为长度为n的序列所能构成的BST的总数。
+
+- 事实1：G(n)值只与序列长度有关，与序列的内容无关。例如，序列1,2,3,4和序列1,4,6,8构成的BST总数都是G(4)
+
+- 事实2：BST的总数=左子树种类*右子树种类
+
+  对序列1~n，假设以i为根节点，则结点1~i-1在左子树，结点i+1~n在右子树。则以i为根节点的BST总数为G(i-1) * G(n-1)
+
+  ![fig1](images/96_fig1.png)
+
+- 计算G(n)：
+
+  遍历1~n中的每个数字，并以该数字为根节点。将以每个数字作为根节点所得到的BST总数进行加和，即可得到G(n)。
+  $$
+  G(n) = \sum_{i=1}^nG(i - 1) * G(n - i)
+  \\ 边界情况：G(0) = 1, G(1) = 1
+  $$
+
+```java
+class Solution {
+    public int numTrees(int n) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        dp[1] = 1;
+        // 序列长度为i
+        for (int i = 2; i <= n; i++) {
+            // 根节点从1变到i，其值记作j
+            for (int j = 1; j <= i; j++) {
+                // j-1为左子树的结点数，i-j为右子树的结点数
+                dp[i] += dp[j - 1] * dp[i - j];
+            }
+        }
+        return dp[n];
+    }
+}
+```
+
+- 时间复杂度：Θ(N<sup>2</sup>)
+- 空间复杂度：Θ(N)
+
+# 102. 二叉树的层序遍历
+
+```java
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null) {
+            return res;   
+        }
+        Queue<TreeNode> q = new LinkedList<>();
+        q.add(root);
+        while (!q.isEmpty()) {
+            int size = q.size();
+            List<Integer> cur = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = q.remove();
+                cur.add(node.val);
+                if (node.left != null) {
+                    q.add(node.left);
+                }
+                if (node.right != null) {
+                    q.add(node.right);
+                }
+
+            }
+            res.add(cur);
+        }
+        return res;
+    }
+}
+```
+
+
 
 # 200. 岛屿数量
 
@@ -1270,4 +1428,151 @@ class Solution {
 
 - 时间复杂度：O(n + m)
 - 空间复杂度：O(1)
+
+# 767. 重构字符串
+
+## 法一：贪心+最大堆
+
+- 统计每个字母出现的次数，用int数组 `counts`记录
+
+- 如果出现最多的字母出现次数>(n + 1) / 2，则字符串不可能重构成功
+
+- 使用最大堆储存字母，将出现次数>0的字母放入最大堆
+
+  - 连续2次从最大堆中取出堆顶的元素，并放入结果字符串
+
+  - 将字母的出现次数-1，若此时剩余出现次数仍>0，则再次把字母放入最大堆
+  - 以上两步重复n / 2次
+
+- 如果此时最大堆不为空，说明n为奇数，则把最大堆中的最后一个元素放入结果字符串
+
+```java
+class Solution {
+    public String reorganizeString(String s) {
+        int[] counts = new int[26];
+        int maxCount = 0, n = s.length();
+        for (int i = 0; i < s.length(); i++) {
+            int p = s.charAt(i) - 'a';
+            counts[p]++;
+            maxCount = Math.max(maxCount, counts[p]);
+        }
+        if (maxCount > (n + 1) >> 1) {
+            return "";
+        }
+        PriorityQueue<Character> maxHeap = new PriorityQueue<>((c1, c2) -> counts[c2 - 'a'] - counts[c1 - 'a']);
+        for (int i = 0; i < 26; i++) {
+            if (counts[i] > 0) {
+                maxHeap.add((char) (i + 'a'));
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n >> 1; i++) {
+            char c1 = maxHeap.poll();
+            char c2 = maxHeap.poll();
+            sb.append(c1);
+            sb.append(c2);
+            counts[c1 - 'a']--;
+            counts[c2 - 'a']--;
+            if (counts[c1 - 'a'] > 0) {
+                maxHeap.add(c1);
+            }
+            if (counts[c2 - 'a'] > 0) {
+                maxHeap.add(c2);
+            }
+        }
+        if (!maxHeap.isEmpty()) {
+            sb.append(maxHeap.poll());
+        }
+        return sb.toString();
+    }
+}
+```
+
+- 时间复杂度：Θ(Nlog|Σ| + N + |Σ| )，其中Σ是字符集，本题中|Σ|=26
+- 空间复杂度：Θ(|Σ|)
+
+### 总结
+
+- 最大堆：
+
+  ```java
+  PriorityQueue<T> maxHeap = new PriorityQueue<>((o1, o2) -> o2 - o1)
+  ```
+
+- 最小堆：
+
+  ```java
+  PriorityQueue<T> maxHeap = new PriorityQueue<>((o1, o2) -> o1 - o2)
+  ```
+
+  
+
+## ※法二：贪心+计数
+
+首先，考虑这样一个事实：当n是奇数且出现最多的字母的出现次数为(n+1)/2时，这个字母必须放到偶数位。其余情况下，每个字母放奇数位和偶数位均可。
+
+因此，可以用贪心法解决问题：
+
+- 统计每个字母出现的次数，用int数组 `counts`记录
+- 维护两个下标`evenIndex`和`oddIndex`，初始值分别为0和1，每次在该下标上填入字母后，该下标+2。另外，相同的字母要连续填。
+- 遍历`counts`
+  - 如果该字母出现的次数为(0, n / 2]，且`oddIndex`<n，则把该字母填入奇数位
+  - 否则，把该字母填入偶数位
+
+证明：对于出现最多的字母，即使该字母有`p`个在奇数下标，有`q`个在偶数下标，该字母也不可能在相邻下标出现
+
+- 假设n为偶数，该字母的出现次数为n/2，则其最小的奇数下标为n-2p+1，最大的偶数下标为2(q-1)，则两者之差为：
+  $$
+  (n−2p+1)−2(q−1) =  n - 2(p + q) + 3 = 3
+  $$
+
+- 假设n为奇数，该字母的出现次数为(n - 1) / 2，则其最小的奇数下标为n-2p，最大的偶数下标为2(q-1)，则两者之差为：
+  $$
+  (n−2p)−2(q−1) =  n - 2(p + q) + 2 = 3
+  $$
+
+- 因此，该字母的最小奇数下标和最大偶数下标之差>=3，该字母不可能相邻！
+
+```java
+class Solution {
+    public String reorganizeString(String s) {
+        int[] counts = new int[26];
+        int maxCount = 0, n = s.length();
+        int oddIndex = 1, evenIndex = 0;
+        for (int i = 0; i < s.length(); i++) {
+            int p = s.charAt(i) - 'a';
+            counts[p]++;
+            if (counts[p] > maxCount) {
+                maxCount = counts[p];
+            }
+            maxCount = Math.max(maxCount, counts[p]);
+        }
+        if (maxCount > (n + 1) / 2) {
+            return "";
+        }
+        char[] res = new char[n];
+        for (int i = 0; i < 26; i++) {
+            char c = (char) (i + 'a');
+            while (counts[i] > 0 && counts[i] <= n / 2 && oddIndex < n) {
+                res[oddIndex] = c;
+                oddIndex += 2;
+                counts[i]--;
+            }
+            while (counts[i] > 0) {
+                res[evenIndex] = c;
+                evenIndex += 2;
+                counts[i]--;
+            }
+        }
+        return new String(res);
+    }
+}
+```
+
+- 时间复杂度：Θ(N +|Σ|)，其中Σ是字符集，本题中|Σ|=26
+- 空间复杂度：Θ(N+|Σ|)
+
+
+
+
 
