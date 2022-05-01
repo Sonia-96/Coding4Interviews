@@ -162,7 +162,35 @@ class Solution {
 
 ## 179. Largest Number
 
+### Approach 1: Sorting via custom comparator
 
+1. Convert each integer into a string
+
+2. Sort the array in descending order. The rule is: if s1 + s2 > s2 + s1, then s1 is bigger than s2. Once the array is sorted, the most "significant" number will be at the front.
+
+3. There is a minor edge case that comes up when the array consists of only zeroes, so if the most sifnificant number is 0, we can simply return 0.
+
+4. Iterate the array and concatenate each string. The result is the largest number.  
+
+```java
+class Solution {
+    public String largestNumber(int[] nums) {
+        String[] strings = new String[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            strings[i] = Integer.toString(nums[i]);
+        }
+        Arrays.sort(strings, (s1, s2) -> (s2 + s1).compareTo(s1 + s2));
+        if (strings[0].equals("0")) {
+            return "0";
+        }
+        StringBuilder res = new StringBuilder();
+        for (String s : strings) {
+            res.append(s);
+        }
+        return res.toString();
+    }
+}
+```
 
 # Linked List
 
