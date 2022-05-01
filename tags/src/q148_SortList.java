@@ -32,7 +32,7 @@ public class q148_SortList {
             }
             p = p.next;
         }
-        p.next = n1 == null? n2 : n1;
+        p.next = (n1 == null) ? n2 : n1;
         return sentinel.next;
     }
 
