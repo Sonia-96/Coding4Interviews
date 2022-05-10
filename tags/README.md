@@ -367,7 +367,7 @@ class Solution {
 
 Build a max heap, do the `remove()` operation for `k - 1` times, then return the biggest element.
 
-Althgouh we can use the class `PriorityQueue` to solve this problem, it is always required to implement the heap by yourself in the interview. Therefore, it is recommended to build the heap from scratch. 
+Although we can use the class `PriorityQueue` to solve this problem, it is always required to implement the heap by yourself in the interview. Therefore, it is recommended to build the heap from scratch. 
 
 Complexity analysis:
 
@@ -430,6 +430,11 @@ class Solution {
 
 The algorithm **randomized-select** is modeled after quick sort. As in quick sort, we partition the input array recursively. But unlike quick sort, which recursively processes both sides of the partition, randomized-select works on only onside of the partition. To be specific, the `partition()` function returns the index of the pivot, which is `p`. If `p` equals `k`, we return this value. if `p` is smaller than `k`, we only partition the right side recursively. Otherwise, we partition the right side recursively.
 
+Complexity analysis:
+
+- Time complexity: Θ(N) (see Introduction to Algorithms 9.2)
+- Space complexity: Θ(logN)
+
 ```java
 class Solution {
     public int findKthLargest(int[] nums, int k) {
@@ -468,13 +473,6 @@ class Solution {
     }
 }
 ```
-
-
-
-Complexity analysis:
-
-- Time complexity: Θ(N) (see Introduction to Algorithms 9.2)
-- Space complexity: Θ(logN)
 
 # Linked List
 
@@ -531,7 +529,7 @@ class Solution {
 Use two pointers `slow` and `fast` which initially points to the `head` node. The `fast` node traverses twice as fast as `slow`. When `fast` is null or `fast.next` is null, `slow` must be in the middle of the list.
 
 - Time complexity: Θ(N), where N is the number of the nodes given in the list
-- Space coplexity: Θ(1), the space used by the two pointers
+- Space complexity: Θ(1), the space used by the two pointers
 
 ```java
 /**
