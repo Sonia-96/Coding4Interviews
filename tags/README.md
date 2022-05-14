@@ -476,14 +476,183 @@ class Solution {
 
 # Linked List
 
-| No.                                           | Difficult | Tags                      | Last Completed | High-F |
-| --------------------------------------------- | --------- | ------------------------- | -------------- | ------ |
-| **206. Reverse Linked List**                  | Easy      | Linked list, Recursion    | 2022-05-09     |        |
-| 876. Middle of the Linked List                | Easy      | Linked list, Two pointers | 2022-04-27     |        |
-| 160. Intersection of Two Linked Lists         | Easy      |                           |                |        |
-| 141. Linked List Cycle (Linked List Cycle II) |           |                           |                |        |
-| 92. Reverse Linked List II                    |           |                           |                |        |
-| 328. Odd Even Linked List                     |           |                           |                |        |
+| No.                                           | Difficult | Tags                               | Last Completed | High-F |
+| --------------------------------------------- | --------- | ---------------------------------- | -------------- | ------ |
+| **206. Reverse Linked List**                  | Easy      | Linked list, Recursion             | 2022-05-09     |        |
+| 876. Middle of the Linked List                | Easy      | Linked list, Two pointers          | 2022-04-27     |        |
+| 160. Intersection of Two Linked Lists         | Easy      | Linked list, Two pointers          | 2022-05-11     |        |
+| 141. Linked List Cycle (Linked List Cycle II) | Easy      | Linked list, Hashing, Two pointers | 2022-05-12     |        |
+| **92. Reverse Linked List II**                | Medium    | Linked list                        | 2022-05-13     |        |
+| 328. Odd Even Linked List                     | Medium    | Linked list                        | 2022-05-13     |        |
+
+## 92. Reverse Linked List II
+
+Requirement: one-pass algorithm
+
+### Approach 1
+
+1. Find the node previous to the position `left`
+2. Reverse the linked list from `left` to `right`
+3. Link each part of the linked list
+
+<img src="images/q92.png" alt="q92" style="zoom:20%;" />
+
+
+
+```java
+public ListNode reverseBetween(ListNode head, int left, int right) {
+        // create a sentinel node
+        ListNode sentinel = new ListNode(-1);
+        sentinel.next = head;
+        // find the node previous to the position left
+        ListNode leftPrev = sentinel;
+        for (int i = 0; i < left - 1; i++) {
+            leftPrev = leftPrev.next;
+        }
+        // reverse the linked list from the position left to right
+        ListNode prev = null, curr = leftPrev.next, next;
+        for (int i = left; i <= right; i++) {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        // link each part
+        leftPrev.next.next = curr;
+        leftPrev.next = prev;
+        return sentinel.next;
+    }
+```
+
+Complexity analysis:
+
+- Time complexity: Θ(N) 
+- Space complexity: Θ(1)
+
+### Approach 2
+
+In the area that needs to be reversed, we loop through the nodes and insert each node to the start position in this area.
+
+<img src="images/1615105242-ZHlvOn-image.png" alt="image.png" style="zoom:50%;" />
+
+The following is the explanation of how to insert the node:
+
+Use three pointers:
+
+- `pre`: always point to the node previous to the reversed area
+- `curr`: always point to the first node in the reversed area. For example, in the following picture, `curr` always point to the node with the value 2.
+- `next`: the node next to the `curr`
+
+<img src="images/1615105296-bmiPxl-image.png" alt="image.png" style="zoom: 33%;" />
+
+Change the `next` pointers of nodes `pre`, `curr`, and `next`:
+
+① curr.next = next.next
+
+② next.next = pre.next
+
+③ pre.next = next
+
+```java
+class Solution {
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        ListNode sentinel = new ListNode(-1);
+        sentinel.next = head;
+        // find the node previous to the position left
+        ListNode leftPrev = sentinel;
+        for (int i = 0; i < left - 1; i++) {
+            leftPrev = leftPrev.next;
+        }
+        ListNode curr = leftPrev.next, next;
+        for (int i = left; i < right; i++) {
+            next = curr.next;
+            curr.next = next.next;
+            next.next = leftPrev.next;
+            leftPrev.next = next;
+        }
+        return sentinel.next;
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: Θ(N) 
+- Space complexity: Θ(1)
+
+## 141. Linked List Cycle
+
+### Approach 1: Hashing
+
+Traverse the linked list, and use a hash set to store visited nodes. While traversing, if the current node has been contained in the hash set, the linked list has a cycle. If the current node becomes `null`, the list has no cycle.
+
+```java
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        HashSet<ListNode> visited = new HashSet<>();
+        while (head != null) {
+            if (!visited.add(head)) {
+                return true;
+            }
+            head = head.next;
+        }
+        return false;
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: Θ(N)
+- Space complexity: Θ(N)
+
+### Approach 2: Fast and slow pointers
+
+Use 2 pointers, `slow` and `fast`. The `slow` moves step by step, and `fast` moves two steps at a time. If the linked list has a cycle, two pointers will meet at some point. Otherwise, the `fast`  or `fast.next` will become `null`.
+
+```java
+class Solution {
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return false;
+        }
+        ListNode slow = head, fast = head.next;
+        while (slow != fast) {
+            if (fast == null || fast.next == null) {
+                return false;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return true;
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: Θ(N)
+- Space complexity: Θ(1)
+
+## 160. Intersection of Two Linked Lists
+
+解析&证明：https://leetcode.cn/problems/intersection-of-two-linked-lists/solution/xiang-jiao-lian-biao-by-leetcode-solutio-a8jn/
+
+```java
+class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+         if (headA == null || headB == null) {
+             return null;
+         }
+         ListNode pA = headA, pB = headB;
+         while (pA != pB) {
+             pA = pA == null ? headB : pA.next;
+             pB = pB == null ? headA : pB.next;
+         }
+         return pA;
+    }
+}
+```
 
 ## 206. Reverse Linked List
 
@@ -516,6 +685,70 @@ class Solution {
         head.next.next = head;
         head.next = null;
         return newHead;
+    }
+}
+```
+
+## 328. Odd Even Linked List
+
+Requirement: You must solve the problem in `O(1)` extra space complexity and `O(n)` time complexity.
+
+### Approach 1
+
+Put the odd nodes in a linked list and even nodes in another. Than link the `evenList` to the tail of the `oddList`.
+
+```java
+class Solution {
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null) {
+            return head;
+        }
+        ListNode odd = head, even = head.next, evenHead = even;
+        while (even != null && even.next != null) {
+            odd.next = even.next;
+            odd = odd.next;
+            even.next = odd.next;
+            even = even.next;
+        }
+        odd.next = evenHead;
+        return head;
+    }
+}
+```
+
+### Approach 2
+
+Loop through each odd node, and put this node at the end of the `oddList` but in front of the `evenList`.
+
+We use 4 pointers to mark import node:
+
+- `oddLast`: the last node of the `oddList`
+- `evenLast`: the last node of the `evenList`
+- `curr`: current odd node
+- `next`: the even node after `curr`
+
+<img src="images/q328.jpg" alt="q328" style="zoom:33%;" />
+
+
+
+```java
+class Solution {
+    public ListNode oddEvenList2(ListNode head) {
+        if (head == null || head.next == null || head.next.next == null) {
+            return head;
+        }
+        ListNode oddLast = head, evenLast = head.next;
+        ListNode curr = evenLast.next, next;
+        while (curr != null) {
+            next = curr.next;
+            curr.next = oddLast.next;
+            evenLast.next = next;
+            oddLast.next = curr;
+            oddLast = curr;
+            evenLast = next;
+            curr = next == null ? null : next.next;
+        }
+        return head;
     }
 }
 ```
