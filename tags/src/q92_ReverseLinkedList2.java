@@ -18,8 +18,7 @@ public class q92_ReverseLinkedList2 {
 
     public ListNode reverseBetween2(ListNode head, int left, int right) {
         // create a sentinel node
-        ListNode sentinel = new ListNode(-1);
-        sentinel.next = head;
+        ListNode sentinel = new ListNode(-1, head);
         // find the node previous to the position left
         ListNode leftPrev = sentinel;
         for (int i = 0; i < left - 1; i++) {
@@ -40,8 +39,7 @@ public class q92_ReverseLinkedList2 {
     }
 
     public ListNode reverseBetween(ListNode head, int left, int right) {
-        ListNode sentinel = new ListNode(-1);
-        sentinel.next = head;
+        ListNode sentinel = new ListNode(-1, head);
         // find the node previous to the position left
         ListNode leftPrev = sentinel;
         for (int i = 0; i < left - 1; i++) {

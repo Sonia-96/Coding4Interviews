@@ -792,7 +792,7 @@ class Solution {
 | No.                                  | Difficult | Tags         | Last Completed | High-F |
 | ------------------------------------ | --------- | ------------ | -------------- | ------ |
 | 225. Implement Stack using Queues    | Easy      | Queue, Stack | 2022-05-15     |        |
-| 346. Moving Average from Data Stream |           |              |                |        |
+| 346. Moving Average from Data Stream | Easy      | Queue        | 2022-05-15     |        |
 | 281. Zigzag Iterator                 |           |              |                |        |
 | 1429. First Unique Number            |           |              |                |        |
 | 54. Spiral Matrix                    |           |              |                |        |
@@ -937,6 +937,71 @@ class MyStack {
 
     public boolean empty() {
         return q.isEmpty();
+    }
+}
+```
+
+## 346. Moving Average from Data Stream
+
+Note: this problem requires Premium in LeetCode but is free in [LintCode](https://www.lintcode.com/problem/642/description).
+
+Complexity analysis:
+
+- Time complexity: Θ(1)
+- Space complexity: Θ(n)
+
+### Approach #1: Use a queue
+
+```java
+class MovingAverage {
+    Queue<Integer> queue;
+    int size;
+    double sum;
+
+    public MovingAverage(int size) {
+        queue = new LinkedList<>();
+        this.size = size;
+        sum = 0;
+    }
+
+    public double next(int val) {
+        if (queue.size() == size) {
+            sum -= queue.remove();
+        }
+        queue.add(val);
+        sum += val;
+        return  sum / queue.size();
+    }
+}
+```
+
+Note: you should set `sum` as `double` type, or you won't pass the complex test cases because it will cause algorithmic overflow （数值溢出）.
+
+### Approach #2: Use a fixed-length array (circular queue)
+
+```java
+class MovingAverage {
+    int[] window;
+    int count;
+    double sum;
+    int i;
+
+    public MovingAverage(int count) {
+        window = new int[count];
+        sum = 0;
+        i = 0;
+        this.count = 0;
+    }
+
+    public double next(int val) {
+        if (count < window.length) {
+            count--;
+        }
+        sum -= window[i];
+        sum += val;
+        window[i] = val;
+        i = (i + 1) % window.length;
+        return sum / count;
     }
 }
 ```
