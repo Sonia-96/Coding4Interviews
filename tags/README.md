@@ -476,14 +476,14 @@ class Solution {
 
 # Linked List
 
-| No.                                           | Difficult | Tags                               | Last Completed | High-F |
-| --------------------------------------------- | --------- | ---------------------------------- | -------------- | ------ |
-| **206. Reverse Linked List**                  | Easy      | Linked list, Recursion             | 2022-05-09     |        |
-| 876. Middle of the Linked List                | Easy      | Linked list, Two pointers          | 2022-04-27     |        |
-| 160. Intersection of Two Linked Lists         | Easy      | Linked list, Two pointers          | 2022-05-11     |        |
-| 141. Linked List Cycle (Linked List Cycle II) | Easy      | Linked list, Hashing, Two pointers | 2022-05-12     |        |
-| **92. Reverse Linked List II**                | Medium    | Linked list                        | 2022-05-13     |        |
-| 328. Odd Even Linked List                     | Medium    | Linked list                        | 2022-05-13     |        |
+| No.                                           | Difficult | Tags                               | First Completed | High-F |
+| --------------------------------------------- | --------- | ---------------------------------- | --------------- | ------ |
+| **206. Reverse Linked List**                  | Easy      | Linked list, Recursion             | 2022-05-09      |        |
+| 876. Middle of the Linked List                | Easy      | Linked list, Two pointers          | 2022-04-27      |        |
+| 160. Intersection of Two Linked Lists         | Easy      | Linked list, Two pointers          | 2022-05-11      |        |
+| 141. Linked List Cycle (Linked List Cycle II) | Easy      | Linked list, Hashing, Two pointers | 2022-05-12      |        |
+| **92. Reverse Linked List II**                | Medium    | Linked list                        | 2022-05-13      |        |
+| **328. Odd Even Linked List**                 | Medium    | Linked list                        | 2022-05-13      |        |
 
 ## 92. Reverse Linked List II
 
@@ -787,5 +787,172 @@ class Solution {
 }
 ```
 
+# Queue
+
+| No.                                  | Difficult | Tags         | Last Completed | High-F |
+| ------------------------------------ | --------- | ------------ | -------------- | ------ |
+| 225. Implement Stack using Queues    | Easy      | Queue, Stack | 2022-05-15     |        |
+| 346. Moving Average from Data Stream |           |              |                |        |
+| 281. Zigzag Iterator                 |           |              |                |        |
+| 1429. First Unique Number            |           |              |                |        |
+| 54. Spiral Matrix                    |           |              |                |        |
+| 362. Design Hit Counter              |           |              |                |        |
+|                                      |           |              |                |        |
+
+## 225. Implement Stack using Queues
+
+### Approach 1: 2 queues, push - O(1), pop - O(n)
+
+- `push(int x)`: Store the new element at the end of `q1`
+- `pop()`: While doing the `pop()` operation, use `q2` as a temporary storage to enqueue the removed elements from `q1`, then swap the pointer `q1` and `q2`.
+- Use a instance variable `top` to store the top element.
+
+```java
+class MyStack {
+    Queue<Integer> q1;
+    Queue<Integer> q2;
+    int top;
+
+    public MyStack() {
+        q1 = new LinkedList<>();
+        q2 = new LinkedList<>();
+    }
+
+    public void push(int x) {
+        q1.add(x);
+        top = x;
+    }
+
+    public int pop() {
+        while (q1.size() > 1) {
+            top = q1.remove();
+            q2.add(top);
+        }
+        Queue<Integer> temp = q1;
+        q1 = q2;
+        q2 = temp;
+        return q2.remove();
+    }
+
+    public int top() {
+        return top;
+    }
+
+    public boolean empty() {
+        return q1.isEmpty();
+    }
+}
+```
+
+Complexity analysis:
+
+| Operation        | Time complexity | Space complexity |
+| ---------------- | --------------- | ---------------- |
+| void push(int x) | Θ(1)            | Θ(1)             |
+| int pop()        | Θ(n)            | Θ(1)             |
+| int top()        | Θ(1)            | Θ(1)             |
+| boolean empty()  | Θ(1)            | Θ(1)             |
+
+### Approach 2: 2 queues, push - O(n), pop - O(1)
+
+- `push(int x)`: Use `q2` to store the new elements. While `q1` is not empty, move the first element of `q1` to the rear of `q2`. After that, `q2` will store elements in a revered order, just like they are in a stack. Then swap the pointer `q1` and `q2`.
+- `pop()`: Remove and return the first element of `q1`.
+
+```java
+class MyStack {
+    Queue<Integer> q1;
+    Queue<Integer> q2;
+    int top;
+
+    public q225b_MyStack() {
+        q1 = new LinkedList<>();
+        q2 = new LinkedList<>();
+    }
+
+    public void push(int x) {
+        q2.add(x);
+        top = x;
+        while (!q1.isEmpty()) {
+            q2.add(q1.remove());
+        }
+        Queue<Integer> temp = q1;
+        q1 = q2;
+        q2 = temp;
+    }
+
+    public int pop() {
+        int res = q1.remove();
+        if (!q1.isEmpty()) {
+            top = q1.peek();
+        }
+        return res;
+    }
+
+    public int top() {
+        return top;
+    }
+
+    public boolean empty() {
+        return q1.isEmpty();
+    }
+}
+```
+
+Complexity analysis:
+
+| Operation        | Time complexity | Space complexity |
+| ---------------- | --------------- | ---------------- |
+| void push(int x) | Θ(n)            | Θ(1)             |
+| int pop()        | Θ(1)            | Θ(1)             |
+| int top()        | Θ(1)            | Θ(1)             |
+| boolean empty()  | Θ(1)            | Θ(1)             |
+
+### Approach 3: 1 queue, push - O(n), pop - O(1)
+
+This approach is an improved version of approach #2. In this approach, we use only one queue to store the elements in reversed order. To be specific, when we insert a new element, we move previous  elements to the back of the queue.
+
+```java
+class MyStack {
+    Queue<Integer> q;
+
+    public q225c_MyStack() {
+        q = new LinkedList<>();
+    }
+
+    public void push(int x) {
+        q.add(x);
+        int size = q.size();
+        for (int i = 1; i < size; i++) {
+            q.add(q.remove());
+        }
+    }
+
+    public int pop() {
+        return q.remove();
+    }
+
+    public int top() {
+        return q.peek();
+    }
+
+    public boolean empty() {
+        return q.isEmpty();
+    }
+}
+```
 
 
+
+# Stack
+
+| No.                                               | Difficult | Tags | Last Completed | High-F |
+| ------------------------------------------------- | --------- | ---- | -------------- | ------ |
+| 155. Min Stack (follow up Leetcode 716 Max Stack) |           |      |                |        |
+| 232. Implement Queue using Stacks                 |           |      |                |        |
+| 150. Evaluate Reverse Polish Notation             |           |      |                |        |
+| 224. Basic Calculator II (I, II, III, IV)         |           |      |                |        |
+| 20. Valid Parentheses                             |           |      |                |        |
+| 1472. Design Browser History                      |           |      |                |        |
+| 1209. Remove All Adjacent Duplicates in String II |           |      |                |        |
+| 1249. Minimum Remove to Make Valid Parentheses    |           |      |                |        |
+| 735. Asteroid Collision                           |           |      |                |        |
