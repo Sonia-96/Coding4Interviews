@@ -789,15 +789,53 @@ class Solution {
 
 # Queue
 
-| No.                                  | Difficult | Tags         | Last Completed | High-F |
-| ------------------------------------ | --------- | ------------ | -------------- | ------ |
-| 225. Implement Stack using Queues    | Easy      | Queue, Stack | 2022-05-15     |        |
-| 346. Moving Average from Data Stream | Easy      | Queue        | 2022-05-15     |        |
-| 281. Zigzag Iterator                 |           |              |                |        |
-| 1429. First Unique Number            |           |              |                |        |
-| 54. Spiral Matrix                    |           |              |                |        |
-| 362. Design Hit Counter              |           |              |                |        |
-|                                      |           |              |                |        |
+| No.                                  | Difficult | Tags               | Last Completed |
+| ------------------------------------ | --------- | ------------------ | -------------- |
+| 225. Implement Stack using Queues    | Easy      | Queue, Stack       | 2022-05-15     |
+| 346. Moving Average from Data Stream | Easy      | Queue              | 2022-05-15     |
+| 281. Zigzag Iterator                 | Medium    | Iterator           | 2022-05-16     |
+| 1429. First Unique Number            | Medium    | Hash; Linked List  | 2022-05-19     |
+| 54. Spiral Matrix                    | Medium    | Matrix; Simulation | 2022-05-19     |
+| 59. Spiral Matrix II                 | Medium    | Matrix; Simulation | 2022-05-19     |
+| 362. Design Hit Counter              |           |                    |                |
+
+## 54. Spiral Matrix
+
+### Approach #1: Layer-by-layer simulation
+
+We can iterate the matrix layer by later. The k-th layer means that the coordinate of its top-left element is (k, k). 
+
+```java
+class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        LinkedList<Integer> res = new LinkedList<>();
+        int m = matrix.length, n = matrix[0].length;
+        int top = 0, left = 0, bottom = m - 1, right = n - 1;
+        int row, col;
+        while (top <= bottom && left <= right) {
+            for (col = left; col <= right; col++) {
+                res.add(matrix[top][col]);
+            }
+            for (row = top + 1; row <= bottom; row++) {
+                res.add(matrix[row][right]);
+            }
+            if (bottom > top && right > left) {
+                for (col = right - 1; col >= left; col--) {
+                    res.add(matrix[bottom][col]);
+                }
+                for (row = bottom - 1; row > top; row--) {
+                    res.add(matrix[row][left]);
+                }
+            }
+            top++;
+            left++;
+            bottom--;
+            right--;
+        }
+        return res;
+    }
+}
+```
 
 ## 225. Implement Stack using Queues
 
@@ -941,6 +979,49 @@ class MyStack {
 }
 ```
 
+## 281. Zigzag Iterator
+
+Note: this problem requires Premium in LeetCode but is free in [LintCode](https://www.lintcode.com/problem/540/).
+
+### Approach #1: Two pointers
+
+```java
+import java.util.Iterator;
+import java.util.List;
+
+public class ZigzagIterator {
+    Iterator<Integer> it1;
+    Iterator<Integer> it2;
+    int count;
+
+    public ZigzagIterator(List<Integer> v1, List<Integer> v2) {
+        it1 = v1.iterator();
+        it2 = v2.iterator();
+        count = 0;
+    }
+
+    public int next() {
+        count++;
+        if (!it2.hasNext()) {
+            return it1.next();
+        }
+        if (!it1.hasNext()) {
+            return it2.next();
+        }
+        if ((count & 1) == 1) {
+            return it1.next();
+        } else {
+            return it2.next();
+        }
+    }
+
+    public boolean hasNext() {
+        return it1.hasNext() || it2.hasNext();
+    }
+}
+
+```
+
 ## 346. Moving Average from Data Stream
 
 Note: this problem requires Premium in LeetCode but is free in [LintCode](https://www.lintcode.com/problem/642/description).
@@ -1006,13 +1087,103 @@ class MovingAverage {
 }
 ```
 
+## 1429. First Unique Number in Data Stream
+
+Note: this problem requires Premium in LeetCode but is free in [LintCode](https://www.lintcode.com/problem/685/).
+
+### Approach #1
+
+- Use a `Map<Integer, ListNode>` to store unique numbers in the form of Linked List. It should be noticed that the value should be its previous node so that we can easily delete this node when we find it is not unique.
+- Use a pointer `head` to mark the first unique number so that we can return the first unique number in O(1) time.
+- Use a pointer `tail` to mark the tail of the stored linked list. This pointer is helpful when we add a new node.
+- Use a `Set<Integer>` to store duplicates
+
+```java
+class Solution {
+    private class ListNode {
+        int val;
+        ListNode next;
+
+        ListNode(int x) {
+            val = x;
+            next = null;
+        }
+
+        ListNode(int x, ListNode n) {
+            val = x;
+            next = n;
+        }
+    }
+
+    private class DataStream {
+        Map<Integer, ListNode> uniqueNumToPrev;
+        ListNode head, tail;
+        Set<Integer> duplicates;
+
+        public DataStream() {
+            uniqueNumToPrev = new HashMap<>();
+            head = new ListNode(-1); // dummy head
+            tail = head;
+            duplicates = new HashSet<>();
+        }
+
+        public void add(int x) {
+            if (duplicates.contains(x)) {
+                return;
+            }
+            if (uniqueNumToPrev.containsKey(x)) {
+                remove(x);
+                duplicates.add(x);
+            } else {
+                ListNode node = new ListNode(x, null);
+                uniqueNumToPrev.put(x, tail);
+                tail.next = node;
+                tail = node;
+            }
+        }
+
+        private void remove(int x) {
+            // remove the node from the linked list
+            ListNode prev = uniqueNumToPrev.get(x);
+            prev.next = prev.next.next;
+            uniqueNumToPrev.remove(x);
+            // change tail or prev of the next node
+            if (prev.next == null) {
+                tail = prev;
+            } else {
+                uniqueNumToPrev.put(prev.next.val, prev);
+            }
+
+        }
+
+        public int firstUnique() {
+            if (head.next != null) {
+                return head.next.val;
+            }
+            return -1;
+        }
+    }
+
+    public int firstUniqueNumber(int[] nums, int number) {
+        DataStream ds = new DataStream();
+        for (int i = 0; i < nums.length; i++) {
+            ds.add(nums[i]);
+            if (nums[i] == number) {
+                return ds.firstUnique();
+            }
+        }
+        return -1;
+    }
+}
+```
+
 
 
 # Stack
 
 | No.                                               | Difficult | Tags | Last Completed | High-F |
 | ------------------------------------------------- | --------- | ---- | -------------- | ------ |
-| 155. Min Stack (follow up Leetcode 716 Max Stack) |           |      |                |        |
+| 155. Min Stack (follow up LeetCode 716 Max Stack) |           |      |                |        |
 | 232. Implement Queue using Stacks                 |           |      |                |        |
 | 150. Evaluate Reverse Polish Notation             |           |      |                |        |
 | 224. Basic Calculator II (I, II, III, IV)         |           |      |                |        |
