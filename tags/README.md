@@ -796,8 +796,8 @@ class Solution {
 | 281. Zigzag Iterator                 | Medium    | Iterator           | 2022-05-16     |
 | 1429. First Unique Number            | Medium    | Hash; Linked List  | 2022-05-19     |
 | 54. Spiral Matrix                    | Medium    | Matrix; Simulation | 2022-05-19     |
-| 59. Spiral Matrix II                 | Medium    | Matrix; Simulation | 2022-05-19     |
-| 362. Design Hit Counter              |           |                    |                |
+| 59. Spiral Matrix II                 | Medium    | Matrix; Simulation | 2022-05-21     |
+| 362. Design Hit Counter              | Medium    | Queue; Window      | 2022-05-21     |
 
 ## 54. Spiral Matrix
 
@@ -873,7 +873,7 @@ class Solution {
 }
 ```
 
-### Approach #2: 
+### Approach #2: Use direction vector
 
 In approach #1, we use a separate loop for each direction. Here, we use an optimized traversal that can use only one loop for all directions. Specifically, we use an array `directions` to store the changes in x and y coordinates and a pointer `d` to mark the current direction.
 
@@ -1158,6 +1158,95 @@ class MovingAverage {
         window[i] = val;
         i = (i + 1) % window.length;
         return sum / count;
+    }
+}
+```
+
+## 362. Design Hit Counter
+
+Note: this problem requires Premium in LeetCode but is free in [PepCoding](https://www.pepcoding.com/resources/data-structures-and-algorithms-in-java-levelup/stacks/design-hit-counter-official/ojquestion).
+
+### Approach #1: Queue
+
+Complexity analysis:
+
+- Time complexity: O(n) 
+- Space complexity: O(n), where n is the number of hits happening in last 5 minutes.
+
+This solution has a problem. If there are large numbers of hits happen at the same timestamp, the queue will become very big. 
+
+```java
+class HitCounter {
+    Queue<Integer> hits;
+
+    /** Initialize your data structure here. */
+    public HitCounter() {
+        hits = new LinkedList<>();
+    }
+
+    /** Record a hit.
+         @param timestamp - The current timestamp (in seconds granularity). */
+    public void hit(int timestamp) {
+        remove(timestamp);
+        hits.offer(timestamp);
+    }
+
+    /** Return the number of hits in the past 5 minutes.
+         @param timestamp - The current timestamp (in seconds granularity). */
+    public int getHits(int timestamp) {
+        remove(timestamp);
+        return hits.size();
+    }
+
+    private void remove(int timestamp) {
+        if (hits.isEmpty()) return;
+        while (hits.peek() + 300 <= timestamp) {
+            hits.poll();
+        }
+    }
+}
+```
+
+### Approach #2: Window buckets
+
+Use two arrays `times` and `hits` with a fixed size to store the timestamp and the count of hits respectively. 
+
+- `hits(int timestamp)`: Use `timestamp % 300` to compute the index of the timestamp. If the timestamp is not equal to `times[index]`, then five minutes has passed. We should update `times[index ]` and set `hits[index]` as 1. Otherwise, `hits[index]` should add 1.
+
+```java
+class HitCounter {
+    final int WINDOW_SIZE = 300;
+    int[] times;
+    int[] hits;
+
+    /** Initialize your data structure here. */
+    public HitCounter() {
+        times = new int[WINDOW_SIZE];
+        hits = new int[WINDOW_SIZE];
+    }
+
+    /** Record a hit.
+         @param timestamp - The current timestamp (in seconds granularity). */
+    public void hit(int timestamp) {
+        int index = timestamp % WINDOW_SIZE;
+        if (times[index] == timestamp) {
+            hits[index] += 1;
+        } else {
+            times[index] = timestamp;
+            hits[index] = 1;
+        }
+    }
+
+    /** Return the number of hits in the past 5 minutes.
+         @param timestamp - The current timestamp (in seconds granularity). */
+    public int getHits(int timestamp) {
+        int count = 0;
+        for (int i = 0; i < WINDOW_SIZE; i++) {
+            if (timestamp - times[i] < WINDOW_SIZE) {
+                count += hits[i];
+            }
+        }
+        return count;
     }
 }
 ```
