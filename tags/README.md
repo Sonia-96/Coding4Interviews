@@ -1262,6 +1262,11 @@ Note: this problem requires Premium in LeetCode but is free in [LintCode](https:
 - Use a pointer `tail` to mark the tail of the stored linked list. This pointer is helpful when we add a new node.
 - Use a `Set<Integer>` to store duplicates
 
+Complexity analysis:
+
+- Time complexity: O(1) 
+- Space complexity: O(n)
+
 ```java
 class Solution {
     private class ListNode {
@@ -1345,14 +1350,55 @@ class Solution {
 
 # Stack
 
-| No.                                               | Difficult | Tags | Last Completed | High-F |
-| ------------------------------------------------- | --------- | ---- | -------------- | ------ |
-| 155. Min Stack (follow up LeetCode 716 Max Stack) |           |      |                |        |
-| 232. Implement Queue using Stacks                 |           |      |                |        |
-| 150. Evaluate Reverse Polish Notation             |           |      |                |        |
-| 224. Basic Calculator II (I, II, III, IV)         |           |      |                |        |
-| 20. Valid Parentheses                             |           |      |                |        |
-| 1472. Design Browser History                      |           |      |                |        |
-| 1209. Remove All Adjacent Duplicates in String II |           |      |                |        |
-| 1249. Minimum Remove to Make Valid Parentheses    |           |      |                |        |
-| 735. Asteroid Collision                           |           |      |                |        |
+| No.                                               | Difficult | Tags  | Last Completed | High-F |
+| ------------------------------------------------- | --------- | ----- | -------------- | ------ |
+| 155. Min Stack (follow up LeetCode 716 Max Stack) | Easy      | Stack | 2022-05-21     |        |
+| 232. Implement Queue using Stacks                 |           |       |                |        |
+| 150. Evaluate Reverse Polish Notation             |           |       |                |        |
+| 224. Basic Calculator II (I, II, III, IV)         |           |       |                |        |
+| 20. Valid Parentheses                             |           |       |                |        |
+| 1472. Design Browser History                      |           |       |                |        |
+| 1209. Remove All Adjacent Duplicates in String II |           |       |                |        |
+| 1249. Minimum Remove to Make Valid Parentheses    |           |       |                |        |
+| 735. Asteroid Collision                           |           |       |                |        |
+
+## 155. Min Stack
+
+When we push a new element named `a` to the stack, we use an auxiliary stack to store the minimum value in the stack at this time.
+
+Complexity analysis:
+
+- Time complexity: O(1) 
+- Space complexity: O(n)
+
+```java
+class MinStack {
+    Stack<Integer> stack;
+    Stack<Integer> minStack;
+
+    public MinStack() {
+        stack = new Stack<>();
+        minStack = new Stack<>();
+        minStack.add(Integer.MAX_VALUE);
+    }
+
+    public void push(int val) {
+        stack.add(val);
+        minStack.add(Math.min(minStack.peek(), val));
+    }
+
+    public void pop() {
+        stack.pop();
+        minStack.pop();
+    }
+
+    public int top() {
+        return stack.peek();
+    }
+
+    public int getMin() {
+        return minStack.peek();
+    }
+}
+```
+
