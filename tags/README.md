@@ -801,7 +801,7 @@ class Solution {
 
 ## 54. Spiral Matrix
 
-### Approach #1: Layer-by-layer simulation
+### Approach #1: Traverse layer by layer
 
 We can iterate the matrix layer by later. The k-th layer means that the coordinate of its top-left element is (k, k). 
 
@@ -836,6 +836,81 @@ class Solution {
     }
 }
 ```
+
+## 59. Spiral Matrix II
+
+### Approach #1: Traverse layer by layer
+
+This approach is similar to that of 54. Spiral Matrix, except that top == left and bottom == right.
+
+```java
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int[][] res = new int[n][n];
+        int num = 1;
+        int top = 0, bottom = n - 1;
+        int row, col;
+        while (top <= bottom) {
+            for (col = top; col <= bottom; col++) {
+                res[top][col] = num++;
+            }
+            for (row = top + 1; row <= bottom; row++) {
+                res[row][bottom] = num++;
+            }
+            if (top < bottom) {
+                for (col = bottom - 1; col >= top; col--) {
+                    res[bottom][col] = num++;
+                }
+                for (row = bottom - 1; row > top; row--) {
+                    res[row][top] = num++;
+                }
+            }
+            top++;
+            bottom--;
+        }
+        return res;
+    }
+}
+```
+
+### Approach #2: 
+
+In approach #1, we use a separate loop for each direction. Here, we use an optimized traversal that can use only one loop for all directions. Specifically, we use an array `directions` to store the changes in x and y coordinates and a pointer `d` to mark the current direction.
+
+```java
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int[][] res = new int[n][n];
+        int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        int d = 0, num = 1;
+        int row = 0, col = 0, nextRow, nextCol;
+        while (num <= n * n) {
+            res[row][col] = num++;
+            nextRow = Math.floorMod(row + directions[d][0], n);
+            nextCol = Math.floorMod(col + directions[d][1], n);
+
+            if (res[nextRow][nextCol] != 0) {
+                d = (d + 1) % 4;
+            }
+
+            row += directions[d][0];
+            col += directions[d][1];
+        }
+        return res;
+    }
+}
+```
+
+Note:
+
+- `Math.floorDiv(int x, int y)`: 返回最接近x/y的int值
+- `Math.floorMod(int x, int y)`: floor modulus = `x - (floorDiv(x, y) * y)`，最后的结果一定和y同号
+  - [形象解释](https://blog.csdn.net/scarecrow_fly/article/details/105834533)：计算一个时针的位置，且要将结果化为0~11之间的数。如果时针仅顺时针移动，则计算公式为`（position + adjustment) % 12`（记作eq1）。但是，如果时针逆时针移动，那么eq1可能会返回负值。此时，采用`floorMod(position + adjustment, 12)`可解决这个问题。
+
+比较`%`（取余）和`floorMod`（取模）的区别：
+
+- (-1) % 3 = -1
+- floorMod(-1, 3) = 2
 
 ## 225. Implement Stack using Queues
 

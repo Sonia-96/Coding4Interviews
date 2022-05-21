@@ -2,7 +2,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-public class q59_SpiralMatrix2 {
+public class q59a_SpiralMatrix2 {
     public int[][] generateMatrix(int n) {
         int[][] res = new int[n][n];
         int num = 1;
