@@ -1350,17 +1350,17 @@ class Solution {
 
 # Stack
 
-| No.                                               | Difficult | Tags  | Last Completed | High-F |
-| ------------------------------------------------- | --------- | ----- | -------------- | ------ |
-| 155. Min Stack (follow up LeetCode 716 Max Stack) | Easy      | Stack | 2022-05-21     |        |
-| 232. Implement Queue using Stacks                 |           |       |                |        |
-| 150. Evaluate Reverse Polish Notation             |           |       |                |        |
-| 224. Basic Calculator II (I, II, III, IV)         |           |       |                |        |
-| 20. Valid Parentheses                             |           |       |                |        |
-| 1472. Design Browser History                      |           |       |                |        |
-| 1209. Remove All Adjacent Duplicates in String II |           |       |                |        |
-| 1249. Minimum Remove to Make Valid Parentheses    |           |       |                |        |
-| 735. Asteroid Collision                           |           |       |                |        |
+| No.                                               | Difficult | Tags         | Last Completed | High-F |
+| ------------------------------------------------- | --------- | ------------ | -------------- | ------ |
+| 155. Min Stack (follow up LeetCode 716 Max Stack) | Easy      | Stack        | 2022-05-21     |        |
+| 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22     |        |
+| 150. Evaluate Reverse Polish Notation             |           |              |                |        |
+| 224. Basic Calculator II (I, II, III, IV)         |           |              |                |        |
+| 20. Valid Parentheses                             |           |              |                |        |
+| 1472. Design Browser History                      |           |              |                |        |
+| 1209. Remove All Adjacent Duplicates in String II |           |              |                |        |
+| 1249. Minimum Remove to Make Valid Parentheses    |           |              |                |        |
+| 735. Asteroid Collision                           |           |              |                |        |
 
 ## 155. Min Stack
 
@@ -1401,4 +1401,117 @@ class MinStack {
     }
 }
 ```
+
+## 232. Implement Queue Using Stacks
+
+### Approach #1: push - O(n), pop - O(1)
+
+- `push(int x)`: A queue is FIFO but a stack is LIFO. This means that we should push the newest element to the bottom of the stack. To do so, we first transfer all `s1` elements to the auxiliary stack `s2`, and add the newest element to `s1`, then pop all `s2` elements to `s1`. After doing this, the last elements is at the bottom of `s1`.
+
+```java
+class MyQueue {
+    Stack<Integer> stack1;
+    Stack<Integer> stack2;
+    int front;
+
+    public MyQueue() {
+        stack1 = new Stack<>();
+        stack2 = new Stack<>();
+    }
+
+    public void push(int x) {
+        if (stack1.isEmpty()) {
+            front = x;
+        }
+        while (!stack1.isEmpty()) {
+            stack2.push(stack1.pop());
+        }
+        stack1.push(x);
+        while (!stack2.isEmpty()) {
+            stack1.push(stack2.pop());
+        }
+    }
+
+    public int pop() {
+        int res = stack1.pop();
+        if (!stack1.empty()) {
+            front = stack1.peek();
+        }
+        return res;
+    }
+
+    public int peek() {
+        return front;
+    }
+
+    public boolean empty() {
+        return stack1.isEmpty();
+    }
+}
+```
+
+Complexity analysis:
+
+| Operation        | Time complexity | Space complexity |
+| ---------------- | --------------- | ---------------- |
+| void push(int x) | Θ(n)            | Θ(n)             |
+| int pop()        | Θ(1)            | Θ(1)             |
+| int top()        | Θ(1)            | Θ(1)             |
+| boolean empty()  | Θ(1)            | Θ(1)             |
+
+### Approach #2: push - O(1), pop - amortized O(1)
+
+- `push(int x)`: always put the last element on top of `s1`
+- `pop()`: pop all elements from `s1` to `s2` then return the top element of `s2`.
+
+```java
+class MyQueue {
+    Stack<Integer> stack1;
+    Stack<Integer> stack2;
+
+    public MyQueue() {
+        stack1 = new Stack<>();
+        stack2 = new Stack<>();
+    }
+
+    public void push(int x) {
+        stack1.push(x);
+    }
+
+    public int pop() {
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
+        }
+        return stack2.pop();
+    }
+
+    public int peek() {
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
+        }
+        return stack2.peek();
+    }
+
+    public boolean empty() {
+        return stack1.isEmpty() && stack2.isEmpty();
+    }
+}
+```
+
+
+
+Complexity analysis:
+
+| Operation        | Time complexity                 | Space complexity |
+| ---------------- | ------------------------------- | ---------------- |
+| void push(int x) | Θ(1)                            | Θ(n)             |
+| int pop()        | Amortised Θ(1), worst-case Θ(n) | Θ(1)             |
+| int top()        | Θ(1)                            | Θ(1)             |
+| boolean empty()  | Θ(1)                            | Θ(1)             |
+
+## 716. Max Stack
 
