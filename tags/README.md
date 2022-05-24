@@ -1353,7 +1353,7 @@ class Solution {
 | No.                                               | Difficult | Tags         | Last Completed | High-F |
 | ------------------------------------------------- | --------- | ------------ | -------------- | ------ |
 | 155. Min Stack                                    | Easy      | Stack        | 2022-05-21     |        |
-| 716. Max Stack                                    | Hard      | Stack        | 2022-05-22     |        |
+| 716. Max Stack                                    | Easy      | Stack        | 2022-05-22     |        |
 | 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22     |        |
 | 150. Evaluate Reverse Polish Notation             |           |              |                |        |
 | 224. Basic Calculator II (I, II, III, IV)         |           |              |                |        |
@@ -1517,6 +1517,9 @@ Complexity analysis:
 ## 716. Max Stack
 
 This problem is free in [LintCode](https://www.lintcode.com/problem/859/).
+
+```java
+```
 
 
 
