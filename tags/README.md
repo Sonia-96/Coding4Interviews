@@ -1355,13 +1355,19 @@ class Solution {
 | 155. Min Stack                                    | Easy      | Stack        | 2022-05-21     |        |
 | 716. Max Stack                                    | Easy      | Stack        | 2022-05-22     |        |
 | 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22     |        |
-| 150. Evaluate Reverse Polish Notation             |           |              |                |        |
+| 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24     |        |
 | 224. Basic Calculator II (I, II, III, IV)         |           |              |                |        |
 | 20. Valid Parentheses                             |           |              |                |        |
 | 1472. Design Browser History                      |           |              |                |        |
 | 1209. Remove All Adjacent Duplicates in String II |           |              |                |        |
 | 1249. Minimum Remove to Make Valid Parentheses    |           |              |                |        |
 | 735. Asteroid Collision                           |           |              |                |        |
+
+## 150. Evaluate Reverse Polish Notation  
+
+### Approach #1: Stack
+
+
 
 ## 155. Min Stack
 
@@ -1402,6 +1408,61 @@ class MinStack {
     }
 }
 ```
+
+## 224. Basic Calculator
+
+### Approach #1: Stack (iteration)
+
+1. Use the `sign` with values {1, -1} to represent current operator. When we add a number, we add `sign * number`.
+   - Note, the number may be bigger than 9, so we should use all consecutive digits to make the number.
+2. Use a stack `ops` to store signs, the top element of which is the outer sign for the current parenthesis. 
+   - If we meet '(', we push the sign to the top. 
+   - If we meet ')', we pop the top element.
+   - If we meet '+', `sign = ops.peek()`
+   - If we meet '-', `sign = - ops.peek()`
+
+```java
+public int calculate(String s) {
+        int res = 0;
+        int sign = 1;
+        int i = 0;
+        Stack<Integer> ops = new Stack<>();
+        ops.push(sign);
+
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                ops.push(sign);
+            } else if (c == ')') {
+                ops.pop();
+            } else if (c == '+') {
+                sign = ops.peek();
+            } else if (c == '-') {
+                sign = - ops.peek();
+            } else if (Character.isDigit(c)) {
+                int num = Character.getNumericValue(c);
+                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    i++;
+                    num = num * 10 + Character.getNumericValue(s.charAt(i));
+                }
+                res += sign * num;
+            }
+            i++;
+        }
+        return res;
+    }
+```
+
+Complexity analysis:
+
+- Time complexity: O(n) 
+- Space complexity: O(n)
+
+**反思**
+
+这道题我原本是用递归做的，具体思路是，每当遇到`(`就`return res + calculate(s, i + 1)`。这样做是不对的，因为它改变了运算顺序：它会优先算s[1+1:]的值。例如，对于`(7)-(0)+(4)`，递归做法会先算`(0) + (4) = 4`，然后再算`7 - 4 = 3`，这相当于是在解`(7)-((0)+(4))`。
+
+应该有可行的递归做法，但我目前还没想到。后面如果想到了再回来写题解。
 
 ## 232. Implement Queue Using Stacks
 
@@ -1518,7 +1579,61 @@ Complexity analysis:
 
 This problem is free in [LintCode](https://www.lintcode.com/problem/859/).
 
+This problem is similar to the 115. Min Stack except for `popMax()`.
+
+Complexity analysis:
+
+- Time complexity: worst-case for popMax() is Θ(n) 
+- Space complexity: O(n)
+
 ```java
+import java.util.Stack;
+
+public class MaxStack {
+
+    Stack<Integer> stack;
+    Stack<Integer> maxStack;
+
+    public q716_MaxStack() {
+        stack = new Stack<>();
+        maxStack = new Stack<>();
+    }
+
+    public void push(int x) {
+        stack.push(x);
+        if (maxStack.isEmpty() || maxStack.peek() <= x) {
+            maxStack.push(x);
+        } else {
+            maxStack.push(maxStack.peek());
+        }
+    }
+
+    public int pop() {
+        maxStack.pop();
+        return stack.pop();
+    }
+
+    public int top() {
+        return stack.peek();
+    }
+
+    public int peekMax() {
+        return maxStack.peek();
+    }
+
+    public int popMax() {
+        int max = peekMax();
+        Stack<Integer> buffer = new Stack<>();
+        while (top() != max) {
+            buffer.push(pop());
+        }
+        pop();
+        while (!buffer.isEmpty()) {
+            push(buffer.pop());
+        }
+        return max;
+    }
+}
 ```
 
 
