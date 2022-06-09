@@ -14,8 +14,6 @@ public class q227a_BasicCalculator {
             if (Character.isDigit(c)) {
                 num = num * 10 + c - '0';
             }
-            // && has higher priority than ||
-            // Therefore, s || q && r equals s || (q && r)
             if (i == s.length() - 1 || !Character.isDigit(c) && c != ' ') {
                 if (operation == '+') {
                     stack.push(num);

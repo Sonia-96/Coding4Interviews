@@ -1357,7 +1357,9 @@ class Solution {
 | 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22     |        |
 | 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24     |        |
 | **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08     |        |
-| 227. Basic Calculator II                          | Medium    | Stack        | 2022-06-08     |        |
+| 227. Basic Calculator II                          | Medium    | Stack        | 2022-06-09     |        |
+| 772. Basic Calculator III                         | Hard      |              |                |        |
+| 770. Basic Calculator IV                          | Hard      |              |                |        |
 | 20. Valid Parentheses                             |           |              |                |        |
 | 1472. Design Browser History                      |           |              |                |        |
 | 1209. Remove All Adjacent Duplicates in String II |           |              |                |        |
@@ -1365,6 +1367,106 @@ class Solution {
 | 735. Asteroid Collision                           |           |              |                |        |
 
 ## 150. Evaluate Reverse Polish Notation  
+
+## 155. Min Stack
+
+When we push a new element named `a` to the stack, we use an auxiliary stack to store the minimum value in the stack at this time.
+
+Complexity analysis:
+
+- Time complexity: O(1) 
+- Space complexity: O(n)
+
+```java
+class MinStack {
+    Stack<Integer> stack;
+    Stack<Integer> minStack;
+
+    public MinStack() {
+        stack = new Stack<>();
+        minStack = new Stack<>();
+        minStack.add(Integer.MAX_VALUE);
+    }
+
+    public void push(int val) {
+        stack.add(val);
+        minStack.add(Math.min(minStack.peek(), val));
+    }
+
+    public void pop() {
+        stack.pop();
+        minStack.pop();
+    }
+
+    public int top() {
+        return stack.peek();
+    }
+
+    public int getMin() {
+        return minStack.peek();
+    }
+}
+```
+
+## 224. Basic Calculator
+
+### Approach #1: Stack (iteration)
+
+1. Use the `sign` with values {1, -1} to represent current operator. When we add a number, we add `sign * number`.
+   - Note, the number may be bigger than 9, so we should use all consecutive digits to make the number.
+2. Use a stack `ops` to store signs, the top element of which is the outer sign for the current parenthesis. 
+   - If we meet '(', we push the sign to the top. 
+   - If we meet ')', we pop the top element.
+   - If we meet '+', `sign = ops.peek()`
+   - If we meet '-', `sign = - ops.peek()`
+
+```java
+class Solution {
+    public int calculate(String s) {
+        int res = 0;
+        int sign = 1;
+        Stack<Integer> stack = new Stack<>();
+        stack.push(sign);
+        int i = 0;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                int num = c - '0';
+                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    i++;
+                    num = num * 10 + s.charAt(i) - '0';
+                }
+                res += sign * num;
+            } else {
+                if (c == '+') {
+                    sign = stack.peek();
+                } else if (c == '-') {
+                    sign = -stack.peek();
+                } else if (c == '(') {
+                    stack.push(sign);
+                } else if (c == ')') {
+                    stack.pop();
+                }
+            }
+            i++;
+        }
+        return res;
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n) 
+- Space complexity: O(n)
+
+**反思**
+
+这道题我原本是用递归做的，具体思路是，每当遇到`(`就`return res + calculate(s, i + 1)`。这样做是不对的，因为它改变了运算顺序：它会优先算s[1+1:]的值。例如，对于`(7)-(0)+(4)`，递归做法会先算`(0) + (4) = 4`，然后再算`7 - 4 = 3`，这相当于是在解`(7)-((0)+(4))`。
+
+应该有可行的递归做法，但我目前还没想到。后面如果想到了再回来写题解。
+
+## 227. Basic Calculator II
 
 ### Approach #1: Stack
 
@@ -1377,6 +1479,8 @@ Scan the input string from left to right:
    - '+' / '-' : We must evaluate the expression based on the next operation, so we just push the current number to the stack so that we can use them later.
    - '*' / '/': Pop the top value from the stack and evaluate the expression. 
 3. Scan the stack and add all values.
+
+:star: Note, `&&` has higher priority than `||`. For example, `s || q && r` equals `s || (q && r)`.
 
 ```java
 class Solution {
@@ -1454,101 +1558,6 @@ Complexity analysis:
 
 - Time complexity: O(n)
 - Space complexity: O(1)
-
-## 155. Min Stack
-
-When we push a new element named `a` to the stack, we use an auxiliary stack to store the minimum value in the stack at this time.
-
-Complexity analysis:
-
-- Time complexity: O(1) 
-- Space complexity: O(n)
-
-```java
-class MinStack {
-    Stack<Integer> stack;
-    Stack<Integer> minStack;
-
-    public MinStack() {
-        stack = new Stack<>();
-        minStack = new Stack<>();
-        minStack.add(Integer.MAX_VALUE);
-    }
-
-    public void push(int val) {
-        stack.add(val);
-        minStack.add(Math.min(minStack.peek(), val));
-    }
-
-    public void pop() {
-        stack.pop();
-        minStack.pop();
-    }
-
-    public int top() {
-        return stack.peek();
-    }
-
-    public int getMin() {
-        return minStack.peek();
-    }
-}
-```
-
-## 224. Basic Calculator
-
-### Approach #1: Stack (iteration)
-
-1. Use the `sign` with values {1, -1} to represent current operator. When we add a number, we add `sign * number`.
-   - Note, the number may be bigger than 9, so we should use all consecutive digits to make the number.
-2. Use a stack `ops` to store signs, the top element of which is the outer sign for the current parenthesis. 
-   - If we meet '(', we push the sign to the top. 
-   - If we meet ')', we pop the top element.
-   - If we meet '+', `sign = ops.peek()`
-   - If we meet '-', `sign = - ops.peek()`
-
-```java
-public int calculate(String s) {
-        int res = 0;
-        int sign = 1;
-        int i = 0;
-        Stack<Integer> ops = new Stack<>();
-        ops.push(sign);
-
-        while (i < s.length()) {
-            char c = s.charAt(i);
-            if (c == '(') {
-                ops.push(sign);
-            } else if (c == ')') {
-                ops.pop();
-            } else if (c == '+') {
-                sign = ops.peek();
-            } else if (c == '-') {
-                sign = - ops.peek();
-            } else if (Character.isDigit(c)) {
-                int num = Character.getNumericValue(c);
-                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
-                    i++;
-                    num = num * 10 + Character.getNumericValue(s.charAt(i));
-                }
-                res += sign * num;
-            }
-            i++;
-        }
-        return res;
-    }
-```
-
-Complexity analysis:
-
-- Time complexity: O(n) 
-- Space complexity: O(n)
-
-**反思**
-
-这道题我原本是用递归做的，具体思路是，每当遇到`(`就`return res + calculate(s, i + 1)`。这样做是不对的，因为它改变了运算顺序：它会优先算s[1+1:]的值。例如，对于`(7)-(0)+(4)`，递归做法会先算`(0) + (4) = 4`，然后再算`7 - 4 = 3`，这相当于是在解`(7)-((0)+(4))`。
-
-应该有可行的递归做法，但我目前还没想到。后面如果想到了再回来写题解。
 
 ## 232. Implement Queue Using Stacks
 

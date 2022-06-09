@@ -28,7 +28,7 @@ public class q227b_BasicCalculator {
     }
 
     @Test
-    public void test1() {
+    public void test() {
         Assert.assertEquals(7, calculate("3+2*2"));
         Assert.assertEquals(1, calculate(" 3/2 "));
         Assert.assertEquals(5, calculate(" 3+5 / 2 "));
