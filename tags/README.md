@@ -1356,7 +1356,8 @@ class Solution {
 | 716. Max Stack                                    | Easy      | Stack        | 2022-05-22     |        |
 | 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22     |        |
 | 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24     |        |
-| 224. Basic Calculator II (I, II, III, IV)         |           |              |                |        |
+| **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08     |        |
+| 227. Basic Calculator II                          | Medium    | Stack        | 2022-06-08     |        |
 | 20. Valid Parentheses                             |           |              |                |        |
 | 1472. Design Browser History                      |           |              |                |        |
 | 1209. Remove All Adjacent Duplicates in String II |           |              |                |        |
@@ -1367,7 +1368,92 @@ class Solution {
 
 ### Approach #1: Stack
 
+As we know, '*' and '/' always have higher precedence than '+' and '-'. We can first evaluate multiplications and divisions and store the values to the stack, then add all values to get the result.
 
+Scan the input string from left to right:
+
+1. If the current char is a digit, add it to the current number
+2. Otherwise, we look at the operation previous to the current number:
+   - '+' / '-' : We must evaluate the expression based on the next operation, so we just push the current number to the stack so that we can use them later.
+   - '*' / '/': Pop the top value from the stack and evaluate the expression. 
+3. Scan the stack and add all values.
+
+```java
+class Solution {
+    public int calculate(String s) {
+        Stack<Integer> stack = new Stack<>();
+        char operation = '+';
+        int num = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                num = num * 10 + c - '0';
+            }
+            if (!Character.isDigit(c) && c != ' ' || i == s.length() - 1){
+                if (operation == '+') {
+                    stack.push(num);
+                } else if (operation == '-') {
+                    stack.push(-num);
+                } else if (operation == '*') {
+                    stack.push(stack.pop() * num);
+                } else if (operation == '/') {
+                    stack.push(stack.pop() / num);
+                }
+                operation = c;
+                num = 0;
+            }
+        }
+        int res = 0;
+        while (!stack.isEmpty()) {
+            res += stack.pop();
+        }
+        return res;
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n)
+- Space complexity: O(n)
+
+### Approach #2: Optimized approach without stack
+
+In approach #1, we only use the stack's top element to evaluate multiplications and divisions. We can use a variable `res` beforehand and `prevNum` to keep track of the top element, thus eliminating the need for the stack.
+
+```java
+class Solution {
+    public int calculate(String s) {
+        int res = 0, currNum = 0, prevNum = 0;
+        char operation = '+';
+    	for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                currNum = currNum * 10 + c - '0';
+            }
+            if (!Character.isDigit(c) && c != ' ' || i == s.length() - 1) {
+                if (operation == '+' || operation == '-') {
+                    res += prevNum;
+                    prevNum = operation == '+' ? currNum : -currNum;
+                } else if (operation =='*') {
+                    prevNum *= currNum;
+                } else {
+                    prevNum /= currNum;
+                }
+                currNum = 0;
+                operation = c;
+            }
+        }
+        res += prevNum;
+        return res;
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n)
+- Space complexity: O(1)
 
 ## 155. Min Stack
 
