@@ -3,25 +3,30 @@ import org.junit.Test;
 
 public class q227b_BasicCalculator {
     public int calculate(String s) {
-        int res = 0, currNum = 0, prevNum = 0;
         char operation = '+';
-        for (int i = 0; i < s.length(); i++) {
+        int prevNum = 0, currNum = 0, res = 0;
+        int i = 0;
+        while (i < s.length()) {
             char c = s.charAt(i);
             if (Character.isDigit(c)) {
-                currNum = currNum * 10 + c - '0';
+                currNum = c - '0';
+                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    i++;
+                    currNum = currNum * 10 + s.charAt(i) - '0';
+                }
             }
-            if (!Character.isDigit(c) && c != ' ' || i == s.length() - 1) {
+            if (i == s.length() - 1 || s.charAt(i) != ' ' && !Character.isDigit(s.charAt(i))) {
                 if (operation == '+' || operation == '-') {
                     res += prevNum;
                     prevNum = operation == '+' ? currNum : -currNum;
                 } else if (operation =='*') {
                     prevNum *= currNum;
-                } else {
+                } else if (operation == '/') {
                     prevNum /= currNum;
                 }
-                currNum = 0;
-                operation = c;
+                operation = s.charAt(i);
             }
+            i++;
         }
         res += prevNum;
         return res;
