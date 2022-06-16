@@ -1664,8 +1664,6 @@ class MyQueue {
 }
 ```
 
-
-
 Complexity analysis:
 
 | Operation        | Time complexity                 | Space complexity |
@@ -1735,6 +1733,75 @@ public class MaxStack {
     }
 }
 ```
+
+## 772.Basic Calculator III
+
+### Approach #1: recursion
+
+本题在227. Basic Calculator III基础上增加了括号，我们可以在227的题解上增加对括号的处理。具体处理方式为：如果遇到左括号，那么则寻找右括号的位置（这里用了一个trick，详情请看代码），然后取出这段substring进行递归。
+
+```java
+class Solution {
+    public int calculate(String s) {
+        int res = 0, prevNum = 0, currNum = 0;
+        char operation = '+';
+        int i = 0;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                currNum = c - '0';
+                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    i++;
+                    c = s.charAt(i);
+                    currNum = currNum * 10 + c - '0';
+                }
+            } else if (c == '(') {
+                // find the index of enclosing parenthsis
+                int j = i, cnt = 1;
+                while (cnt > 0) {
+                    i++;
+                    if (s.charAt(i) == '(') {
+                        cnt++;
+                    } else if (s.charAt(i) == ')') {
+                        cnt--;
+                    }
+                }
+                currNum = calculate(s.substring(j + 1, i));
+                c = s.charAt(i);
+            }
+            if (i == s.length() - 1 || c != ' ' && !Character.isDigit(c)) {
+                if (operation == '+' || operation == '-') {
+                    res += prevNum;
+                    prevNum = operation == '+' ? currNum : -currNum;
+                } else if (operation == '*') {
+                    prevNum *= currNum;
+                } else if (operation == '/') {
+                    prevNum /= currNum;
+                }
+                operation = c;
+            }
+            i++;
+        }
+        res += prevNum;
+        return res;
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: 
+  - worst-case: O(n<sup>2</sup>). 本题解每次碰到左括号，都会对括号部分进行遍历。如果该算式有多层嵌套的括号，如(1 +(2 + (3)))，那么每一层括号都会被重新遍历一次，这时该算法的复杂度最大可为O(n<sup>2</sup>)。 
+  - best: O(n)
+- Space complexity: 假设该算式有m层括号，那么该算法会递归m次，而且每一次递归都要取一次substring
+  - worst-case: O(n<sup>2</sup>)
+  - best: O(1)
+
+### Approach #2: Two stacks
+
+本题相当于是224. Basic Calculator I和227. Basic Calculator II的结合。224用了一个栈存储符号，227则用了一个栈存储数字，因此，在解本题时，我们可以使用两个栈，一个储存符号，一个储存数字。
+
+参考题解：https://www.youtube.com/watch?v=YazIB0OZBoI
 
 
 

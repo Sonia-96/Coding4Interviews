@@ -9,10 +9,15 @@ public class q772_BasicCalculator {
         while (i < s.length()) {
             char c = s.charAt(i);
             if (Character.isDigit(c)) {
-                currNum = currNum * 10 + c - '0';
+                currNum = c - '0';
+                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    i++;
+                    c = s.charAt(i);
+                    currNum = currNum * 10 + c - '0';
+                }
             } else if (c == '(') {
-                int cnt = 1, j = i;
-                while (cnt != 0) {
+                int j = i, cnt = 1;
+                while (cnt > 0) {
                     i++;
                     if (s.charAt(i) == '(') {
                         cnt++;
@@ -23,7 +28,7 @@ public class q772_BasicCalculator {
                 currNum = calculate(s.substring(j + 1, i));
                 c = s.charAt(i);
             }
-            if (!Character.isDigit(c) && c != ' ' && c != ')' || i == s.length() - 1) {
+            if (i == s.length() - 1 || c != ' ' && !Character.isDigit(c)) {
                 if (operation == '+' || operation == '-') {
                     res += prevNum;
                     prevNum = operation == '+' ? currNum : -currNum;
@@ -33,7 +38,6 @@ public class q772_BasicCalculator {
                     prevNum /= currNum;
                 }
                 operation = c;
-                currNum = 0;
             }
             i++;
         }
