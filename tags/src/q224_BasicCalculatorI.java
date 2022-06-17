@@ -3,7 +3,7 @@ import org.junit.Test;
 
 import java.util.Stack;
 
-public class q224_BasicCalculator {
+public class q224_BasicCalculatorI {
     public int calculate(String s) {
         int res = 0;
         int sign = 1;

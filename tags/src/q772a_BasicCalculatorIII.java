@@ -1,7 +1,7 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-public class q772_BasicCalculator {
+public class q772a_BasicCalculatorIII {
     public int calculate(String s) {
         int res = 0, prevNum = 0, currNum = 0;
         char operation = '+';

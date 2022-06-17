@@ -1358,8 +1358,8 @@ class Solution {
 | 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24     |        |
 | **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08     |        |
 | 227. Basic Calculator II                          | Medium    | Stack        | 2022-06-09     |        |
-| 772. Basic Calculator III                         | Hard      | Stack        | 2022-06-09     |        |
-| 770. Basic Calculator IV                          | Hard      |              |                |        |
+| 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17     |        |
+| 770. Basic Calculator IV                          | Hard      | Stack        |                |        |
 | 20. Valid Parentheses                             |           |              |                |        |
 | 1472. Design Browser History                      |           |              |                |        |
 | 1209. Remove All Adjacent Duplicates in String II |           |              |                |        |
@@ -1736,9 +1736,11 @@ public class MaxStack {
 
 ## 772.Basic Calculator III
 
+This problem is free in [LintCode](https://www.lintcode.com/problem/849/solution/18404).（但是test cases不如leetcode全面）
+
 ### Approach #1: recursion
 
-本题在227. Basic Calculator III基础上增加了括号，我们可以在227的题解上增加对括号的处理。具体处理方式为：如果遇到左括号，那么则寻找右括号的位置（这里用了一个trick，详情请看代码），然后取出这段substring进行递归。
+本题在227. Basic Calculator III基础上增加了括号，我们可以在227的题解上增加对括号的处理。具体方法为：如果遇到左括号，则寻找右括号的位置（这里用了一个trick，详情请看代码），然后取出这段substring进行递归。
 
 ```java
 class Solution {
@@ -1791,17 +1793,98 @@ class Solution {
 Complexity analysis:
 
 - Time complexity: 
-  - worst-case: O(n<sup>2</sup>). 本题解每次碰到左括号，都会对括号部分进行遍历。如果该算式有多层嵌套的括号，如(1 +(2 + (3)))，那么每一层括号都会被重新遍历一次，这时该算法的复杂度最大可为O(n<sup>2</sup>)。 
-  - best: O(n)
+  - worst-case: O(n<sup>2</sup>). 本算法每次碰到左括号，都会对括号部分进行遍历。如果该算式有多层嵌套的括号，如(1 +(2 + (3)))，那么每一层括号都会被重新遍历一次，这时该算法的复杂度最大可为O(n<sup>2</sup>)。 
+  - best: O(n). 没有括号的情况
 - Space complexity: 假设该算式有m层括号，那么该算法会递归m次，而且每一次递归都要取一次substring
   - worst-case: O(n<sup>2</sup>)
   - best: O(1)
 
 ### Approach #2: Two stacks
 
-本题相当于是224. Basic Calculator I和227. Basic Calculator II的结合。224用了一个栈存储符号，227则用了一个栈存储数字，因此，在解本题时，我们可以使用两个栈，一个储存符号，一个储存数字。
+本题相当于是224. Basic Calculator I和227. Basic Calculator II的结合。224用了一个栈存储符号，227的Approach#1则用了一个栈存储数字，因此，在解本题时，我们可以使用两个栈，一个`nums`储存符号，一个`ops`储存数字。
+
+对于s[i]:
+
+- 如果是数字，那么则找全数字，压入`nums`
+- 如果是左括号，直接压入`ops`
+- 如果是运算符：如果当前的操作符比`ops`栈顶的优先级小，则可以进行运算（另写函数`operate`），然后将得到的数压入`nums`
+- 如果是右括号，对栈顶的算式进行运算，直至`ops`栈顶为左括号
 
 参考题解：https://www.youtube.com/watch?v=YazIB0OZBoI
 
+```java
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
+public class Solution {
+    Map<Character, Integer> precedence;
+
+    public Solution() {
+        precedence = new HashMap<>();
+        precedence.put('(', -1);
+        precedence.put('+', 0);
+        precedence.put('-', 0);
+        precedence.put('*', 1);
+        precedence.put('/', 1);
+    }
+
+    public int calculate(String s) {
+        Stack<Integer> nums = new Stack<>();
+        Stack<Character> ops = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                int num = c - '0';
+                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    i++;
+                    num = num * 10 + s.charAt(i) - '0';
+                }
+                nums.push(num);
+            } else if (c == '(') {
+                ops.push('(');
+            } else if (c == ')') {
+                while (ops.peek() != '(') {
+                    nums.push(operate(nums, ops));
+                }
+                ops.pop();
+            } else if (c != ' ') {
+                // 这里必须用while，不能用if
+                // 例如，对于，1*2-3*4+5*6
+                // if相当于计算1*2-(3*4+5*6)=-40
+                while (!ops.isEmpty() && compare(c, ops.peek()) <= 0) {
+                    nums.push(operate(nums, ops));
+                }
+                ops.push(c);
+            }
+        }
+        while (!ops.isEmpty()) {
+            nums.push(operate(nums, ops));
+        }
+        return nums.pop();
+    }
+
+    private int operate(Stack<Integer> nums, Stack<Character> ops) {
+        int a = nums.pop();
+        int b = nums.pop();
+        char op = ops.pop();
+        switch (op) {
+            case '+': return b + a;
+            case '-': return b - a;
+            case '*': return b * a;
+            case '/': return b / a;
+            default: return 0;
+        }
+    }
+
+    private int compare(char op1, char op2) {
+        return precedence.get(op1) - precedence.get(op2);
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n)
+- Space complexity: O(n)
 
