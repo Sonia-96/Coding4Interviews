@@ -3,41 +3,39 @@ import org.junit.Test;
 
 public class q772a_BasicCalculatorIII {
     public int calculate(String s) {
-        int res = 0, prevNum = 0, currNum = 0;
-        char operation = '+';
+        int prevNum = 0, currNum = 0, res = 0;
+        char op = '+';
         int i = 0;
         while (i < s.length()) {
             char c = s.charAt(i);
             if (Character.isDigit(c)) {
                 currNum = c - '0';
                 while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    currNum = currNum * 10 + s.charAt(i + 1) - '0';
                     i++;
-                    c = s.charAt(i);
-                    currNum = currNum * 10 + c - '0';
                 }
             } else if (c == '(') {
-                int j = i, cnt = 1;
-                while (cnt > 0) {
+                int start = i, count = 1;
+                while (count > 0) {
                     i++;
-                    if (s.charAt(i) == '(') {
-                        cnt++;
-                    } else if (s.charAt(i) == ')') {
-                        cnt--;
+                    if (s.charAt(i) == ')') {
+                        count--;
+                    } else if (s.charAt(i) == '(') {
+                        count++;
                     }
                 }
-                currNum = calculate(s.substring(j + 1, i));
-                c = s.charAt(i);
+                currNum = calculate(s.substring(start + 1, i));
             }
             if (i == s.length() - 1 || c != ' ' && !Character.isDigit(c)) {
-                if (operation == '+' || operation == '-') {
-                    res += prevNum;
-                    prevNum = operation == '+' ? currNum : -currNum;
-                } else if (operation == '*') {
+                if (op == '+' || op == '-') {
+                    res += prevNum; //prevNum是op前面的数字
+                    prevNum = op == '+' ? currNum : -currNum;
+                } else if (op == '*') {
                     prevNum *= currNum;
-                } else if (operation == '/') {
+                } else if (op == '/'){
                     prevNum /= currNum;
                 }
-                operation = c;
+                op = c;
             }
             i++;
         }

@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-class q772b_BasicCalculaorIII {
+class q772b_BasicCalculatorIII {
     Map<Character, Integer> precedence;
 
-    public q772b_BasicCalculaorIII () {
+    public q772b_BasicCalculatorIII() {
         precedence = new HashMap<>();
-        precedence.put('(', -1);
+        precedence.put('(', -1); // 例，1 * (3 -，这种情况不能运算
         precedence.put('+', 0);
         precedence.put('-', 0);
         precedence.put('*', 1);
@@ -37,9 +37,11 @@ class q772b_BasicCalculaorIII {
                 }
                 ops.pop();
             } else if (c != ' ') {
-                // 这里必须用while，不能用if。例如，对于，1*2-3*4+5*6
-                // if相当于计算1*2-(3*4+5*6)=-40
-                if (!ops.isEmpty() && compare(c, ops.peek()) <= 0) {
+                // 若当前运算符的优先级<=上一个运算符，如 1 * 2 +，则上一个运算符可以进行运算
+                // 这里必须用while，不能用if
+                // 因为operate是从后往前算的，如果不把前面能算的先算了，最后可能导致运算顺序改变
+                // 例如，对于1*2-3*4+5*6, 使用if相当于计算1*2-(3*4+5*6)
+                while (!ops.isEmpty() && compare(c, ops.peek()) <= 0) {
                     nums.push(operate(nums, ops));
                 }
                 ops.push(c);
@@ -55,19 +57,18 @@ class q772b_BasicCalculaorIII {
         int a = nums.pop();
         int b = nums.pop();
         char op = ops.pop();
-        switch (op) {
-            case '+': return b + a;
-            case '-': return b - a;
-            case '*': return b * a;
-            case '/': return b / a;
-            default: return 0;
-        }
+        return switch (op) {
+            case '+' -> b + a;
+            case '-' -> b - a;
+            case '*' -> b * a;
+            case '/' -> b / a;
+            default -> 0;
+        };
     }
 
     private int compare(char op1, char op2) {
         return precedence.get(op1) - precedence.get(op2);
     }
-
 
     @Test
     public void test() {

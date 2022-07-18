@@ -1526,31 +1526,27 @@ Complexity analysis:
 In approach #1, we only use the stack's top element to evaluate multiplications and divisions. We can use a variable `res` beforehand and `prevNum` to keep track of the top element, thus eliminating the need for the stack.
 
 ```java
-public class Solution {
+class Solution {
     public int calculate(String s) {
-        int prevNum = 0, currNum = 0, res = 0;
         char op = '+';
-        int i = 0;
-        while (i < s.length()) {
-            if (Character.isDigit(s.charAt(i))) {
-                currNum = s.charAt(i) - '0';
-                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
-                    currNum = currNum * 10 + s.charAt(i + 1) - '0';
-                    i++;
-                }
+        int prevNum = 0, currNum = 0, res = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                currNum = currNum * 10 + c - '0';
             }
-            if (i == s.length() - 1 || s.charAt(i) != ' ' && !Character.isDigit(s.charAt(i))) {
+            if (!Character.isDigit(c) && c != ' ' || i == s.length() - 1){
                 if (op == '+' || op == '-') {
-                    res += prevNum;
+                    res += prevNum; // prevNum是op前的数字
                     prevNum = op == '+' ? currNum : -currNum;
                 } else if (op == '*') {
-                    prevNum = prevNum * currNum;
-                } else {
-                    prevNum = prevNum / currNum;
+                    prevNum *= currNum;
+                } else if (op == '/') {
+                    prevNum /= currNum;
                 }
-                op = s.charAt(i);
+                op = c;
+                currNum = 0;
             }
-            i++;
         }
         res += prevNum;
         return res;
@@ -1735,51 +1731,69 @@ public class MaxStack {
 
 ## 772.Basic Calculator III
 
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string may contain open `(` and closing parentheses `)`, the plus `+` or minus sign `-`, non-negative integers and empty spaces ` `.
+
+The expression string contains only non-negative integers, `+`, `-`, `*`, `/` operators , open `(` and closing parentheses `)` and empty spaces ` `. The integer division should truncate toward zero.
+
+You may assume that the given expression is always valid. All intermediate results will be in the range of `[-2147483648, 2147483647]`.
+
+Some examples:
+
+```
+"1 + 1" = 2
+" 6-4 / 2 " = 4
+"2*(5+5*2)/3+(6/2+8)" = 21
+"(2+6* 3+5- (3*14/7+2)*5)+3"=-12
+```
+
+Note: Do not use the `eval` built-in library function.
+
+
+
 This problem is free in [LintCode](https://www.lintcode.com/problem/849/solution/18404).（但是test cases不如leetcode全面）
 
 ### Approach #1: recursion
 
-本题在227. Basic Calculator III基础上增加了括号，我们可以在227的题解上增加对括号的处理。具体方法为：如果遇到左括号，则寻找右括号的位置（这里用了一个trick，详情请看代码），然后取出这段substring进行递归。
+本题在227. Basic Calculator II基础上增加了括号，我们可以在227的题解上增加对括号的处理。具体方法为：如果遇到左括号，则寻找右括号的位置（这里用了一个trick，详情请看代码），然后取出这段substring进行递归。
 
 ```java
 class Solution {
     public int calculate(String s) {
-        int res = 0, prevNum = 0, currNum = 0;
-        char operation = '+';
+        int prevNum = 0, currNum = 0, res = 0;
+        char op = '+';
         int i = 0;
         while (i < s.length()) {
             char c = s.charAt(i);
             if (Character.isDigit(c)) {
                 currNum = c - '0';
                 while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    currNum = currNum * 10 + s.charAt(i + 1) - '0';
                     i++;
-                    c = s.charAt(i);
-                    currNum = currNum * 10 + c - '0';
                 }
             } else if (c == '(') {
-                // find the index of enclosing parenthsis
-                int j = i, cnt = 1;
-                while (cnt > 0) {
+                int start = i, count = 1;
+                while (count > 0) {
                     i++;
-                    if (s.charAt(i) == '(') {
-                        cnt++;
-                    } else if (s.charAt(i) == ')') {
-                        cnt--;
+                    if (s.charAt(i) == ')') {
+                        count--;
+                    } else if (s.charAt(i) == '(') {
+                        count++;
                     }
                 }
-                currNum = calculate(s.substring(j + 1, i));
-                c = s.charAt(i);
+                currNum = calculate(s.substring(start + 1, i));
             }
             if (i == s.length() - 1 || c != ' ' && !Character.isDigit(c)) {
-                if (operation == '+' || operation == '-') {
-                    res += prevNum;
-                    prevNum = operation == '+' ? currNum : -currNum;
-                } else if (operation == '*') {
+                if (op == '+' || op == '-') {
+                    res += prevNum; //prevNum是op前面的数字
+                    prevNum = op == '+' ? currNum : -currNum;
+                } else if (op == '*') {
                     prevNum *= currNum;
-                } else if (operation == '/') {
+                } else if (op == '/'){
                     prevNum /= currNum;
                 }
-                operation = c;
+                op = c;
             }
             i++;
         }
@@ -1821,11 +1835,11 @@ public class Solution {
 
     public Solution() {
         precedence = new HashMap<>();
-        precedence.put('(', -1);
+        precedence.put('(', -1); // 例，1 * (3 -，这种情况不能运算
         precedence.put('+', 0);
         precedence.put('-', 0);
         precedence.put('*', 1);
-        precedence.put('/', 1);
+        precedence.put('/', 1); 
     }
 
     public int calculate(String s) {
@@ -1848,9 +1862,10 @@ public class Solution {
                 }
                 ops.pop();
             } else if (c != ' ') {
+                // 若当前运算符的优先级<=上一个运算符，如 1 * 2 +，则上一个运算符可以进行运算
                 // 这里必须用while，不能用if
-                // 例如，对于，1*2-3*4+5*6
-                // if相当于计算1*2-(3*4+5*6)=-40
+                // 因为operate是从后往前算的，如果不把前面能算的先算了，最后可能导致运算顺序改变
+                // 例如，对于1*2-3*4+5*6, 使用if相当于计算1*2-(3*4+5*6)=-40
                 while (!ops.isEmpty() && compare(c, ops.peek()) <= 0) {
                     nums.push(operate(nums, ops));
                 }
