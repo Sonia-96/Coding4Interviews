@@ -1423,32 +1423,28 @@ class MinStack {
 ```java
 class Solution {
     public int calculate(String s) {
-        int res = 0;
+        int num = 0, res = 0;
         int sign = 1;
         Stack<Integer> stack = new Stack<>();
-        stack.push(sign);
-        int i = 0;
-        while (i < s.length()) {
+        stack.add(sign);
+        for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (Character.isDigit(c)) {
-                int num = c - '0';
-                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
-                    i++;
-                    num = num * 10 + s.charAt(i) - '0';
-                }
+                num = num * 10 + c - '0';
+            }
+            if (i == s.length() - 1 || c != ' ' && !Character.isDigit(c)){
                 res += sign * num;
-            } else {
                 if (c == '+') {
                     sign = stack.peek();
                 } else if (c == '-') {
-                    sign = -stack.peek();
+                    sign = - stack.peek();
                 } else if (c == '(') {
                     stack.push(sign);
                 } else if (c == ')') {
                     stack.pop();
                 }
+                num = 0;
             }
-            i++;
         }
         return res;
     }
