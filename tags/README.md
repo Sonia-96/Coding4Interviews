@@ -1350,21 +1350,21 @@ class Solution {
 
 # Stack
 
-| No.                                               | Difficult | Tags         | Last Completed | High-F |
-| ------------------------------------------------- | --------- | ------------ | -------------- | ------ |
-| 155. Min Stack                                    | Easy      | Stack        | 2022-05-21     |        |
-| 716. Max Stack                                    | Easy      | Stack        | 2022-05-22     |        |
-| 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22     |        |
-| 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24     |        |
-| **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08     |        |
-| 227. Basic Calculator II                          | Medium    | Stack        | 2022-06-09     |        |
-| 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17     |        |
-| 770. Basic Calculator IV                          | Hard      | Stack        |                |        |
-| 20. Valid Parentheses                             |           |              |                |        |
-| 1472. Design Browser History                      |           |              |                |        |
-| 1209. Remove All Adjacent Duplicates in String II |           |              |                |        |
-| 1249. Minimum Remove to Make Valid Parentheses    |           |              |                |        |
-| 735. Asteroid Collision                           |           |              |                |        |
+| No.                                               | Difficult | Tags         | First Completed | Last Completed | 次数 |
+| ------------------------------------------------- | --------- | ------------ | --------------- | -------------- | ---- |
+| 155. Min Stack                                    | Easy      | Stack        | 2022-05-21      |                |      |
+| 716. Max Stack                                    | Easy      | Stack        | 2022-05-22      |                |      |
+| 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22      |                |      |
+| 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24      |                |      |
+| **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08      | 2022-07-17     | 3    |
+| 227. Basic Calculator II【体感很难】              | Medium    | Stack        | 2022-06-09      | 2022-07-18     | 4    |
+| 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17      |                |      |
+| 770. Basic Calculator IV                          | Hard      | Stack        |                 |                |      |
+| 20. Valid Parentheses                             |           |              |                 |                |      |
+| 1472. Design Browser History                      |           |              |                 |                |      |
+| 1209. Remove All Adjacent Duplicates in String II |           |              |                 |                |      |
+| 1249. Minimum Remove to Make Valid Parentheses    |           |              |                 |                |      |
+| 735. Asteroid Collision                           |           |              |                 |                |      |
 
 ## 150. Evaluate Reverse Polish Notation  
 
@@ -1413,9 +1413,9 @@ class MinStack {
 ### Approach #1: Stack (iteration)
 
 1. Use the `sign` with values {1, -1} to represent current operator. When we add a number, we add `sign * number`.
-   - Note, the number may be bigger than 9, so we should use all consecutive digits to make the number.
+   - Note, the number may be more than 1 digit, so we should use all consecutive digits to make the number.
 2. Use a stack `ops` to store signs, the top element of which is the outer sign for the current parenthesis. 
-   - If we meet '(', we push the sign to the top. 
+   - If we meet '(', we push `sign` to the top. 
    - If we meet ')', we pop the top element.
    - If we meet '+', `sign = ops.peek()`
    - If we meet '-', `sign = - ops.peek()`
@@ -1462,7 +1462,7 @@ Complexity analysis:
 
 **反思**
 
-这道题我原本是用递归做的，具体思路是，每当遇到`(`就`return res + calculate(s, i + 1)`。这样做是不对的，因为它改变了运算顺序：它会优先算s[1+1:]的值。例如，对于`(7)-(0)+(4)`，递归做法会先算`(0) + (4) = 4`，然后再算`7 - 4 = 3`，这相当于是在解`(7)-((0)+(4))`。
+这道题我原本是用递归做的，具体思路是，每当遇到`(`就`return res + calculate(s, i + 1)`。这样做是不对的，因为它改变了运算顺序——它会优先算s[1+1:]的值。例如，对于`(7)-(0)+(4)`，递归做法会先算`(0) + (4) = 4`，然后再算`7 - 4 = 3`，这相当于是在解`(7)-((0)+(4))`。
 
 应该有可行的递归做法，但我目前还没想到。后面如果想到了再回来写题解。
 
@@ -1470,13 +1470,13 @@ Complexity analysis:
 
 ### Approach #1: Stack
 
-As we know, '*' and '/' always have higher precedence than '+' and '-'. We can first evaluate multiplications and divisions and store the values to the stack, then add all values to get the result.
+As we know, '*' and '/' have higher precedence than '+' and '-'. We can first evaluate multiplications and divisions and store their values to the stack, then add all values to get the result.
 
 Scan the input string from left to right:
 
-1. If the current char is a digit, add it to the current number
-2. Otherwise, we look at the *operation* previous to the current number:
-   - '+' / '-' : We must evaluate the expression based on the next operation, so we just push the current number to the stack so that we can use them later.
+1. If the current char is a digit, add it to the current number `num`
+2. Otherwise, we look at the *operation* `op` previous to the current number:
+   - '+' / '-' : We must evaluate the expression based on the next operation, so we just push the current number to the stack so that we can use it later.
    - '*' / '/': Pop the top value from the stack and evaluate the expression. 
 3. Scan the stack and add all values.
 
@@ -1526,30 +1526,29 @@ Complexity analysis:
 In approach #1, we only use the stack's top element to evaluate multiplications and divisions. We can use a variable `res` beforehand and `prevNum` to keep track of the top element, thus eliminating the need for the stack.
 
 ```java
-class Solution {
+public class Solution {
     public int calculate(String s) {
-        char operation = '+';
         int prevNum = 0, currNum = 0, res = 0;
+        char op = '+';
         int i = 0;
         while (i < s.length()) {
-            char c = s.charAt(i);
-            if (Character.isDigit(c)) {
-                currNum = c - '0';
+            if (Character.isDigit(s.charAt(i))) {
+                currNum = s.charAt(i) - '0';
                 while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
+                    currNum = currNum * 10 + s.charAt(i + 1) - '0';
                     i++;
-                    currNum = currNum * 10 + s.charAt(i) - '0';
                 }
             }
             if (i == s.length() - 1 || s.charAt(i) != ' ' && !Character.isDigit(s.charAt(i))) {
-                if (operation == '+' || operation == '-') {
+                if (op == '+' || op == '-') {
                     res += prevNum;
-                    prevNum = operation == '+' ? currNum : -currNum;
-                } else if (operation =='*') {
-                    prevNum *= currNum;
-                } else if (operation == '/') {
-                    prevNum /= currNum;
+                    prevNum = op == '+' ? currNum : -currNum;
+                } else if (op == '*') {
+                    prevNum = prevNum * currNum;
+                } else {
+                    prevNum = prevNum / currNum;
                 }
-                operation = s.charAt(i);
+                op = s.charAt(i);
             }
             i++;
         }

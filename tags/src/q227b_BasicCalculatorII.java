@@ -3,30 +3,25 @@ import org.junit.Test;
 
 public class q227b_BasicCalculatorII {
     public int calculate(String s) {
-        char operation = '+';
+        char op = '+';
         int prevNum = 0, currNum = 0, res = 0;
-        int i = 0;
-        while (i < s.length()) {
+        for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (Character.isDigit(c)) {
-                currNum = c - '0';
-                while (i + 1 < s.length() && Character.isDigit(s.charAt(i + 1))) {
-                    i++;
-                    currNum = currNum * 10 + s.charAt(i) - '0';
-                }
+                currNum = currNum * 10 + c - '0';
             }
-            if (i == s.length() - 1 || s.charAt(i) != ' ' && !Character.isDigit(s.charAt(i))) {
-                if (operation == '+' || operation == '-') {
+            if (!Character.isDigit(c) && c != ' ' || i == s.length() - 1){
+                if (op == '+' || op == '-') {
                     res += prevNum;
-                    prevNum = operation == '+' ? currNum : -currNum;
-                } else if (operation =='*') {
+                    prevNum = op == '+' ? currNum : -currNum;
+                } else if (op == '*') {
                     prevNum *= currNum;
-                } else if (operation == '/') {
+                } else if (op == '/') {
                     prevNum /= currNum;
                 }
-                operation = s.charAt(i);
+                op = c;
+                currNum = 0;
             }
-            i++;
         }
         res += prevNum;
         return res;
