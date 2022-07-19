@@ -1358,7 +1358,7 @@ class Solution {
 | 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24      |                |      |
 | **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08      | 2022-07-17     | 3    |
 | 227. Basic Calculator II【体感很难】              | Medium    | Stack        | 2022-06-09      | 2022-07-18     | 4    |
-| 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17      |                |      |
+| 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17      | 2022-07-18     | 4    |
 | 770. Basic Calculator IV                          | Hard      | Stack        |                 |                |      |
 | 20. Valid Parentheses                             |           |              |                 |                |      |
 | 1472. Design Browser History                      |           |              |                 |                |      |
@@ -1725,6 +1725,10 @@ public class MaxStack {
 }
 ```
 
+## 770. Basic Calculator IV
+
+
+
 ## 772.Basic Calculator III
 
 Implement a basic calculator to evaluate a simple expression string.
@@ -1876,7 +1880,7 @@ public class Solution {
 
     private int operate(Stack<Integer> nums, Stack<Character> ops) {
         int a = nums.pop();
-        int b = nums.pop();
+        int b = nums.isEmpty() ? 0 : nums.pop();
         char op = ops.pop();
         switch (op) {
             case '+': return b + a;

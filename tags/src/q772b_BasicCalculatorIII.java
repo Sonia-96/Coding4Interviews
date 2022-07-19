@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-class q772b_BasicCalculatorIII {
+public class q772b_BasicCalculatorIII {
     Map<Character, Integer> precedence;
 
     public q772b_BasicCalculatorIII() {
@@ -55,7 +55,7 @@ class q772b_BasicCalculatorIII {
 
     private int operate(Stack<Integer> nums, Stack<Character> ops) {
         int a = nums.pop();
-        int b = nums.pop();
+        int b = nums.isEmpty() ? 0 : nums.pop(); // 处理 -1 这种case
         char op = ops.pop();
         return switch (op) {
             case '+' -> b + a;
