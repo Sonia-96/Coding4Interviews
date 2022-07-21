@@ -1361,7 +1361,7 @@ class Solution {
 | 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17      | 2022-07-18     | 5    |
 | 770. Basic Calculator IV【无敌难，答案都看不懂】  | Hard      | Stack        | 2022-07-19      | 2022-07-20     | 1    |
 | 20. Valid Parentheses                             | Easy      | Stack        | 2022-07-21      |                |      |
-| 1472. Design Browser History                      | Medium    | Stack        |                 |                |      |
+| 1472. Design Browser History                      | Medium    | Stack        | 2022-07-21      |                |      |
 | 1209. Remove All Adjacent Duplicates in String II |           |              |                 |                |      |
 | 1249. Minimum Remove to Make Valid Parentheses    |           |              |                 |                |      |
 | 735. Asteroid Collision                           |           |              |                 |                |      |
@@ -1932,3 +1932,50 @@ Complexity analysis:
 - Time complexity: O(n)
 - Space complexity: O(n)
 
+## 1472. Design Browser History
+
+### Approach #1: ArrayList
+
+There are many ways to solve this problem, such as using two stacks to store the websites: one for history, one for future. But I think the simplest way is to use `ArrayList`, where we can access any element or remove last element in O(1) time.
+
+```java
+class BroswerHistory {
+    ArrayList<String> history;
+    int curr;
+
+    public BrowserHistory(String homepage) {
+        history = new ArrayList<>();
+        history.add(homepage);
+        curr = 0;
+    }
+
+    /**
+     * Visits url from the current page.
+     * It clears up all the forward history.
+     */
+    public void visit(String url) {
+        while (curr < history.size() - 1) {
+            history.remove(history.size() - 1);
+        }
+        history.add(url);
+        curr++;
+    }
+
+    public String back(int steps) {
+        curr = Math.max(0, curr - steps);
+        return history.get(curr);
+    }
+
+    public String forward(int steps) {
+        curr = Math.min(history.size() - 1, curr + steps);
+        return history.get(curr);
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: 
+  - visit: worst O(n), best O(1)
+  - back & forward: O(1)
+- Space complexity: O(m) for m websites
