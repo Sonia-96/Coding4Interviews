@@ -1359,12 +1359,42 @@ class Solution {
 | **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08      | 2022-07-17     | 3    |
 | 227. Basic Calculator II【体感很难】              | Medium    | Stack        | 2022-06-09      | 2022-07-18     | 4    |
 | 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17      | 2022-07-18     | 5    |
-| 770. Basic Calculator IV【无敌难，答案都看不懂】  | Hard      | Stack        | 2022-07-19      | 2022-07-20     |      |
-| 20. Valid Parentheses                             |           |              |                 |                |      |
-| 1472. Design Browser History                      |           |              |                 |                |      |
+| 770. Basic Calculator IV【无敌难，答案都看不懂】  | Hard      | Stack        | 2022-07-19      | 2022-07-20     | 1    |
+| 20. Valid Parentheses                             | Easy      | Stack        | 2022-07-21      |                |      |
+| 1472. Design Browser History                      | Medium    | Stack        |                 |                |      |
 | 1209. Remove All Adjacent Duplicates in String II |           |              |                 |                |      |
 | 1249. Minimum Remove to Make Valid Parentheses    |           |              |                 |                |      |
 | 735. Asteroid Collision                           |           |              |                 |                |      |
+
+## 20. Valid Parentheses
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        if ((s.length() % 2) == 1) return false;
+        HashMap<Character, Character> pairs = new HashMap<>() {{
+            put(')', '(');
+            put(']', '[');
+            put('}', '{');
+        }};
+        Stack<Character> stack = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (!pairs.containsKey(c)) {
+                stack.push(c);
+            } else if (stack.isEmpty() || stack.pop() != pairs.get(c)) {
+                return false;
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n) 
+- Space complexity: O(n + |Σ|), |Σ|is the characters set, the size of which is 6 in this problem
 
 ## 150. Evaluate Reverse Polish Notation  
 
