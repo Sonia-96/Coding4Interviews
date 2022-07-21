@@ -1932,6 +1932,10 @@ Complexity analysis:
 - Time complexity: O(n)
 - Space complexity: O(n)
 
+## 1209. Remove All Adjacent Duplicates in String II
+
+方法四和方法五最佳。
+
 ## 1472. Design Browser History
 
 ### Approach #1: ArrayList
