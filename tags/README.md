@@ -1936,6 +1936,16 @@ Complexity analysis:
 
 方法四和方法五最佳。
 
+Approach #1: Brute Force
+
+Approach #2: 
+
+Approach #3:
+
+Approach #4:
+
+Approach #5:  
+
 ## 1472. Design Browser History
 
 ### Approach #1: ArrayList
