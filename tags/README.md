@@ -1,3 +1,5 @@
+[TOC]
+
 reference: https://zhuanlan.zhihu.com/p/349940945
 
 # Sort
@@ -1936,9 +1938,65 @@ Complexity analysis:
 
 方法四和方法五最佳。
 
-Approach #1: Brute Force
+### Approach #1: Brute Force
 
-Approach #2: 
+- Loop through the string, if current character equals the previous one, `count++`; else `count = 1`.
+- if `count == k`, delete the substring, reset i as 0 and count as 1.
+
+1. java: 
+
+   ```java
+   class Solution {
+       public String removeDuplicates(String s, int k) {
+           StringBuilder sb = new StringBuilder(s);
+           int count = 0;
+           for (int i = 1; i < sb.length(); i++) {
+               if (sb.charAt(i) == sb.charAt(i - 1)) {
+                   count++;
+               } else {
+                   count = 1;
+               }
+               if (count == k) {
+                   sb.delete(i - k + 1, i + 1);
+                   i = 0;
+                   count = 1;
+               }
+           }
+           return sb.toString();
+       }
+   }
+   ```
+
+2. c++:
+
+   ```c++
+   class Solution {
+   public:
+       string removeDuplicates(string s, int k) {
+           int count = 1;
+           for (int i = 1; i < s.length(); i++) {
+               if (s[i] == s[i - 1]) {
+                   count++; 
+               } else {
+                   count = 1;
+               }
+               if (count == k) {
+                   s.erase(i - k + 1, k);
+                   i = 0; // i will become 1 after stepping through 'for (int i = 1; i < s.length(); i++)'
+                   count = 1;
+               }
+           }
+           return s;
+       }
+   };
+   ```
+
+Complexity analysis:
+
+- Time complexity: O(n<sup>2</sup>). We'll meet an Time Limit Exceeded error with this approach.
+- Space complexity: O(n)
+
+### Approach #2: 
 
 Approach #3:
 
