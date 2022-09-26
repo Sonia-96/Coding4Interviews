@@ -5,29 +5,19 @@ import java.util.Stack;
 
 public class q1209_RemoveAdjacentDuplicates {
     public String removeDuplicates(String s, int k) {
-        Stack<Integer> counts = new Stack<>();
-        Stack<Character> elements = new Stack<>();
-        int cnt = 0;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (elements.isEmpty() || elements.peek() != c) {
-                counts.push(cnt);
-                elements.add(c);
-                cnt = 1;
-            } else {
-                if (++cnt == k) {
-                    for (int j = 0; j < cnt - 1; j++) {
-                        elements.pop();
-                    }
-                    cnt = counts.pop();
-                } else {
-                    elements.add(c);
-                }
-            }
-        }
         StringBuilder sb = new StringBuilder();
-        for (char c : elements) {
-            sb.append(c);
+        Stack<Integer> counts = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            if (!sb.isEmpty() && sb.charAt(sb.length() - 1) == s.charAt(i)) {
+                counts.push(counts.pop() + 1);
+            } else {
+                counts.push(1);
+            }
+            sb.append(s.charAt(i));
+            if (counts.peek() == k) {
+                counts.pop();
+                sb.delete(sb.length() - k, sb.length());
+            }
         }
         return sb.toString();
     }

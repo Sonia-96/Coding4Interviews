@@ -44,4 +44,11 @@ public class q1209b_RemoveAdjacentDuplicates {
         int k = 2;
         Assert.assertEquals("ps", removeDuplicates(s, k));
     }
+
+    @Test
+    public void test4() {
+        String s = "pbbcggttciiippooaais";
+        int k = 1;
+        Assert.assertEquals("", removeDuplicates(s, k));
+    }
 }

@@ -1998,7 +1998,60 @@ Complexity analysis:
 
 ### Approach #2: 
 
-Approach #3:
+In approach #1, every time after we delete a substring, we should restart from the begining. That's why approach #1 is not efficient. To improve this issue, we use an array `counts` to record the consecutive occurences of each character:
+
+- If s[i] == s[i - 1], count[i] == count[i - 1] + 1; else count[i] == 1
+- if count[i] == k, delete the substring, and set `i` as `i - k`.
+
+```java
+class Solution {
+    public String removeDuplicates(String s, int k) {
+        StringBuilder sb = new StringBuilder(s);
+        int counts[] = new int[s.length()];
+        for (int i = 0; i < sb.length(); i++) {
+            if (i > 0 && sb.charAt(i) == sb.charAt(i - 1)) {
+                counts[i] = counts[i - 1] + 1;
+            } else {
+                counts[i] = 1;
+            }
+            if (counts[i] == k) {
+                sb.delete(i - k + 1, i + 1);
+                i -= k;
+            }
+        }
+        return sb.toString();
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n)
+- Space complexity: O(n)
+
+### Approach #3: Stack
+
+```java
+class Solution {
+    public String removeDuplicates(String s, int k) {
+        StringBuilder sb = new StringBuilder();
+        Stack<Integer> counts = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            if (!sb.isEmpty() && sb.charAt(sb.length() - 1) == s.charAt(i)) {
+                counts.push(counts.pop() + 1);
+            } else {
+                counts.push(1);
+            }
+            sb.append(s.charAt(i));
+            if (counts.peek() == k) {
+                counts.pop();
+                sb.delete(sb.length() - k, sb.length());
+            }
+        }
+        return sb.toString();
+    }
+}
+```
 
 Approach #4:
 

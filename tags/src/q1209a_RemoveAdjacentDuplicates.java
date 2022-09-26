@@ -12,11 +12,11 @@ public class q1209a_RemoveAdjacentDuplicates {
         int length = -1;
         while (length != sb.length()) {
             length = sb.length();
-            int cnt = 0;
+            int count = 0;
             for (int i = 0; i < sb.length(); i++) {
                 if (i == 0 || sb.charAt(i - 1) != sb.charAt(i)) {
-                    cnt = 1;
-                } else if (++cnt == k) {
+                    count = 1;
+                } else if (++count == k) {
                     sb.delete(i - k + 1, i + 1);
                 }
             }
