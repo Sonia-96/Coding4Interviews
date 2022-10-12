@@ -2057,6 +2057,99 @@ Approach #4:
 
 Approach #5:  
 
+## 1381. Design a Stack with Increment Operation
+
+I encounter the same problem in Lucid Software's OA, but the OA problem is more challenging. First, the OA problem has higher requirement for time efficiency. You must complete 2*10<sup>5</sup> operations in less then 4 seconds, so your `inc` operation must be O(1). Second, the range of increment value is -1\*10<sup>9</sup>~1\*10<sup>9</sup>. To avoid integer overflow, we should use long array instead of int array.
+
+### Naive Approach: inc O(k)
+
+```java
+class CustomStack {
+    int[] stack;
+    int size;
+
+    public CustomStack(int maxSize) {
+        stack = new int[maxSize];
+        size = 0;
+    }
+    
+    public void push(int x) {
+        if (size < stack.length) {
+            stack[size++] = x;
+        }
+    }
+    
+    public int pop() {
+        if (size == 0) {
+            return -1;
+        }
+        return stack[--size];
+    }
+    
+    public void increment(int k, int val) {
+        int limit = Math.min(k, size);
+        for (int i = 0; i < limit; i++) {
+            stack[i] += val;
+        }
+    }
+}
+```
+
+Time complexity:
+
+- `push(int x)`: O(1)
+- `pop()`: O(1)
+- `Inc(int k, int val)`: O(k)
+
+### Advanced Approach: inc O(1)
+
+To reduce the time complexity of `void inc(int k, int val)`  to O(1), we use an int array `add` to record the `inc` operations. However, instead of increasing bottom `k` elements right away, we only use `add[k - 1] += val` to make a note. When we execute `pop()`, the returned value should be `stack[size - 1] + add[size - 1]`, then we move the not to the value below, so `add[size - 2] += add[size - 1]`,  
+
+```java
+class CustomStack {
+    int[] stack;
+    int[] add;
+    int size;
+
+    public CustomStack(int maxSize) {
+        stack = new int[maxSize];
+        add = new int[maxSize];
+        Arrays.fill(stack, 0);
+        Arrays.fill(add, 0);
+        size = 0;
+    }
+    
+    public void push(int x) {
+        if (size < stack.length) {
+            stack[size] = x;
+            size++;
+        }
+    }
+    
+    public int pop() {
+        if (size == 0) {
+            return -1;
+        }
+        int res = stack[size - 1] + add[size - 1];
+        if (size > 1) {
+            add[size - 2] += add[size - 1];
+        }
+        add[size - 1] = 0;
+        size--;
+        return res;
+    }
+    
+    public void increment(int k, int val) {
+        int limit = Math.min(k - 1, size - 1);
+        if (limit >= 0) {
+            add[limit] += val;
+        }
+    }
+}
+```
+
+Time complexity: the amortized complexity for each operation is O(1) 
+
 ## 1472. Design Browser History
 
 ### Approach #1: ArrayList
