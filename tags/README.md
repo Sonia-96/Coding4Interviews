@@ -2101,7 +2101,7 @@ class Solution {
 
 As said in Approach #3, deleting from the middle of a StringBuilder requires O(n) operations. Now, instead of deleting the substring, we use two pointers to mark the rest of the string. We use the fast pointer to loop through the string, and we use the slow pointer to mark current left substring. Everytime we delete k characters, slow should be deducted by k.
 
-<img src="/Users/sonia/Documents/CSStudy/LeetCode/Coding4Interviews/tags/assets/1209_approach5.png" alt="img" style="zoom:60%;" />
+<img src="./assets/1209_approach5.png" alt="img" style="zoom:60%;" />
 
 ```java
 class Solution {
