@@ -22,12 +22,13 @@ public class q1209e_RemoveAdjacentDuplicates {
     public String removeDuplicates(String s, int k) {
         Stack<Pair> counts = new Stack<>();
         for (int i = 0; i < s.length(); i++) {
-            if (counts.isEmpty() || s.charAt(i) != counts.peek().ch) {
-                counts.push(new Pair(s.charAt(i), 1));
+            if (!counts.isEmpty() && s.charAt(i) == counts.peek().ch) {
+                counts.peek().count += 1;
             } else {
-                if (++counts.peek().count == k) {
-                    counts.pop();
-                }
+                counts.push(new Pair(s.charAt(i), 1));
+            }
+            if (counts.peek().count == k) {
+                counts.pop();
             }
         }
         StringBuilder sb = new StringBuilder();

@@ -1348,25 +1348,23 @@ class Solution {
 }
 ```
 
-
-
 # Stack
 
-| No.                                               | Difficult | Tags         | First Completed | Last Completed | 次数 |
-| ------------------------------------------------- | --------- | ------------ | --------------- | -------------- | ---- |
-| 155. Min Stack                                    | Easy      | Stack        | 2022-05-21      |                |      |
-| 716. Max Stack                                    | Easy      | Stack        | 2022-05-22      |                |      |
-| 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22      |                |      |
-| 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24      |                |      |
-| **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08      | 2022-07-17     | 3    |
-| 227. Basic Calculator II【体感很难】              | Medium    | Stack        | 2022-06-09      | 2022-07-18     | 4    |
-| 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17      | 2022-07-18     | 5    |
-| 770. Basic Calculator IV【无敌难，答案都看不懂】  | Hard      | Stack        | 2022-07-19      | 2022-07-20     | 1    |
-| 20. Valid Parentheses                             | Easy      | Stack        | 2022-07-21      |                |      |
-| 1472. Design Browser History                      | Medium    | Stack        | 2022-07-21      |                |      |
-| 1209. Remove All Adjacent Duplicates in String II |           |              |                 |                |      |
-| 1249. Minimum Remove to Make Valid Parentheses    |           |              |                 |                |      |
-| 735. Asteroid Collision                           |           |              |                 |                |      |
+| No.                                               | Difficult | Tags         | First Completed | Last Completed | 次数 |      |
+| ------------------------------------------------- | --------- | ------------ | --------------- | -------------- | ---- | ---- |
+| 155. Min Stack                                    | Easy      | Stack        | 2022-05-21      |                |      |      |
+| 716. Max Stack                                    | Easy      | Stack        | 2022-05-22      |                |      |      |
+| 232. Implement Queue using Stacks                 | Easy      | Stack, Queue | 2022-05-22      |                |      |      |
+| 150. Evaluate Reverse Polish Notation             | Medium    | Stack        | 2022-05-24      |                |      |      |
+| **224. Basic Calculator**                         | Hard      | Stack        | 2022-06-08      | 2022-07-17     | 3    |      |
+| 227. Basic Calculator II【体感很难】              | Medium    | Stack        | 2022-06-09      | 2022-07-18     | 4    |      |
+| 772. Basic Calculator III【巨难】                 | Hard      | Stack        | 2022-06-17      | 2022-07-18     | 5    |      |
+| 770. Basic Calculator IV【无敌难，答案都看不懂】  | Hard      | Stack        | 2022-07-19      | 2022-07-20     | 1    |      |
+| 20. Valid Parentheses                             | Easy      | Stack        | 2022-07-21      |                |      |      |
+| 1472. Design Browser History                      | Medium    | Stack        | 2022-07-21      |                |      |      |
+| 1209. Remove All Adjacent Duplicates in String II |           |              |                 |                |      |      |
+| 1249. Minimum Remove to Make Valid Parentheses    |           |              |                 |                |      |      |
+| 735. Asteroid Collision                           |           |              |                 |                |      |      |
 
 ## 20. Valid Parentheses
 
@@ -1936,7 +1934,7 @@ Complexity analysis:
 
 ## 1209. Remove All Adjacent Duplicates in String II
 
-方法四和方法五最佳。
+Approach #3 and Approach #5 is the most efficient.
 
 ### Approach #1: Brute Force
 
@@ -1996,7 +1994,7 @@ Complexity analysis:
 - Time complexity: O(n<sup>2</sup>). We'll meet an Time Limit Exceeded error with this approach.
 - Space complexity: O(n)
 
-### Approach #2: 
+### Approach #2
 
 In approach #1, every time after we delete a substring, we should restart from the begining. That's why approach #1 is not efficient. To improve this issue, we use an array `counts` to record the consecutive occurences of each character:
 
@@ -2031,6 +2029,10 @@ Complexity analysis:
 
 ### Approach #3: Stack
 
+In approach #2, deleting a substring from the middle of a StringBuilding requires O(n) operations, but deleting from the end only requires O(1) operation. Now, we use a stack to store characters.
+
+#### Method 1: StringBuilder (functions as a stack) + Stack\<Integer>
+
 ```java
 class Solution {
     public String removeDuplicates(String s, int k) {
@@ -2053,9 +2055,78 @@ class Solution {
 }
 ```
 
-Approach #4:
+#### Method 2: Stack\<Pair>
 
-Approach #5:  
+This method is more elegant.
+
+```java
+class Solution {
+  class Pair {
+        char ch;
+        int count;
+
+        Pair(char c, int i) {
+            ch = c;
+            count = i;
+        }
+    }
+
+    public String removeDuplicates(String s, int k) {
+        Stack<Pair> counts = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            if (!counts.isEmpty() && s.charAt(i) == counts.peek().ch) {
+                counts.peek().count += 1;
+            } else {
+                counts.push(new Pair(s.charAt(i), 1));
+            }
+            if (counts.peek().count == k) {
+                counts.pop();
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        // Stack is implemented by array, so we can use for-each to count from the bottom to the top
+        for (Pair p : counts) {
+            for (int i = 0; i <p.count; i++) {
+                sb.append(p.ch);
+            }
+        }
+        return sb.toString();
+    }
+}
+```
+
+
+
+### Approach #4: Two pointers
+
+As said in Approach #3, deleting from the middle of a StringBuilder requires O(n) operations. Now, instead of deleting the substring, we use two pointers to mark the rest of the string. We use the fast pointer to loop through the string, and we use the slow pointer to mark current left substring. Everytime we delete k characters, slow should be deducted by k.
+
+<img src="/Users/sonia/Documents/CSStudy/LeetCode/Coding4Interviews/tags/assets/1209_approach5.png" alt="img" style="zoom:60%;" />
+
+```java
+class Solution {
+  public String removeDuplicates(String s, int k) {
+        Stack<Integer> stack = new Stack<>();
+        char sa[] = s.toCharArray();
+        int slow = 0;
+        for (int i = 0; i < s.length(); i++, slow++) {
+            sa[slow] = sa[i];
+            if (slow > 0 && sa[slow] == sa[slow - 1]) {
+                stack.push(stack.pop() + 1);
+            } else {
+                stack.push(1);
+            }
+            if (stack.peek() == k) {
+                slow -= k;
+                stack.pop();
+            }
+        }
+        return new String(sa, 0, slow);
+    }
+}
+```
+
+
 
 ## 1381. Design a Stack with Increment Operation
 

@@ -11,23 +11,22 @@ import java.util.Stack;
  */
 public class q1209d_RemoveAdjacentDuplicates {
     public String removeDuplicates(String s, int k) {
-        Stack<Integer> counts = new Stack<>();
-        char[] sa = s.toCharArray();
-        int j = 0; // 慢指针
-        for (int i = 0; i < sa.length; i++, j++) {
-            sa[j] = sa[i];
-            if (j == 0 || sa[j] != sa[j - 1]) {
-                counts.push(1);
+        Stack<Integer> stack = new Stack<>();
+        char sa[] = s.toCharArray();
+        int slow = 0;
+        for (int i = 0; i < s.length(); i++, slow++) {
+            sa[slow] = sa[i];
+            if (slow > 0 && sa[slow] == sa[slow - 1]) {
+                stack.push(stack.pop() + 1);
             } else {
-                int cnt = counts.pop() + 1;
-                if (cnt == k) {
-                    j = j - k;
-                } else {
-                    counts.push(cnt);
-                }
+                stack.push(1);
+            }
+            if (stack.peek() == k) {
+                slow -= k;
+                stack.pop();
             }
         }
-        return new String(sa, 0, j);
+        return new String(sa, 0, slow);
     }
 
     @Test
