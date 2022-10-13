@@ -1362,7 +1362,7 @@ class Solution {
 | 770. Basic Calculator IV【无敌难，答案都看不懂】  | Hard      | Stack        | 2022-07-19      | 2022-07-20     | 1    |      |
 | 20. Valid Parentheses                             | Easy      | Stack        | 2022-07-21      |                |      |      |
 | 1472. Design Browser History                      | Medium    | Stack        | 2022-07-21      |                |      |      |
-| 1209. Remove All Adjacent Duplicates in String II |           |              |                 |                |      |      |
+| 1209. Remove All Adjacent Duplicates in String II | Medium    | Stack        |                 | 2022-10-12     |      |      |
 | 1249. Minimum Remove to Make Valid Parentheses    |           |              |                 |                |      |      |
 | 735. Asteroid Collision                           |           |              |                 |                |      |      |
 
@@ -2095,8 +2095,6 @@ class Solution {
 }
 ```
 
-
-
 ### Approach #4: Two pointers
 
 As said in Approach #3, deleting from the middle of a StringBuilder requires O(n) operations. Now, instead of deleting the substring, we use two pointers to mark the rest of the string. We use the fast pointer to loop through the string, and we use the slow pointer to mark current left substring. Everytime we delete k characters, slow should be deducted by k.
@@ -2126,11 +2124,128 @@ class Solution {
 }
 ```
 
+## 1249. Minimum Remove to Make Valid Parentheses
 
+### Approach #1: Stack + StringBuilder
+
+Use stack to store the index to `(`, and use a hashset to store the index to remove. Every time we meet a `)`, we check if there's a `(` in stack. If not, we should delete this `)` (add its index to the set). After finishing looping through the string, if the stack is not empty, the `(` in the stack should be deleted.
+
+```java
+class Solution {
+  public String minRemoveToMakeValid(String s) {
+        Stack<Integer> stack = new Stack<>();
+        Set<Integer> indexToRemove = new HashSet<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                stack.push(i);
+            } else if (c == ')') {
+                if (!stack.isEmpty()) {
+                    stack.pop();
+                } else {
+                    indexToRemove.add(i);
+                }
+            }
+        }
+        while (!stack.isEmpty()) {
+            indexToRemove.add(stack.pop());
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            if (!indexToRemove.contains(i)) {
+                sb.append(s.charAt(i));
+            }
+        }
+        return sb.toString();
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n). To be specific, 3n for 3 loops, and 1n for `sb.toString()`. Therefore, the total complecity is 4n.
+- Space complexity: O(n)
+
+### Approach #2: Scan the string for 2 times
+
+1. Scan the string forward, delete all invalid `)`.
+2. Scan the string backward, delete all invaild `(`.
+
+```java
+class Solution {
+  private StringBuilder removeInvalidClosing (CharSequence s, char open, char close) {
+        int balance = 0;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == open) {
+                balance++;
+            } else if (c == close) {
+                if (balance == 0) continue;
+                balance--;
+            }
+            sb.append(c);
+        }
+        return sb.reverse();
+    }
+
+    public String minRemoveToMakeValid(String s) {
+        StringBuilder sb = removeInvalidClosing(s, '(', ')');
+        StringBuilder res = removeInvalidClosing(sb, ')', '(');
+        return res.toString();
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n). To be specific,  the total complecity is 4n.
+- Space complexity: O(n), but is smaller than approach #1. Because approach #2 has no hashmap or stack.
+
+### Approach #3: improved approach #2
+
+When scanning backward, just remove the rightmost `(`.
+
+```java
+class Solution {
+  public String minRemoveToMakeValid(String s) {
+        // 1. scan forward, delete invalid )
+        int balance = 0, openCount = 0;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                openCount++;
+                balance++;
+            } else if (c == ')') {
+                if (balance == 0) continue;
+                balance--;
+            }
+            sb.append(c);
+        }
+        // 2. remove the rightmost (
+        StringBuilder res = new StringBuilder();
+        int openKeep = openCount - balance;
+        for (int i = 0; i < sb.length(); i++) {
+            if (sb.charAt(i) == '(') {
+                if (openKeep == 0) continue;
+                openKeep--;
+            }
+            res.append(sb.charAt(i));
+        }
+        return res.toString();
+    }
+}
+```
+
+Complexity analysis:
+
+- Time complexity: O(n). To be specific,  the total complecity is 3n.
+- Space complexity: O(n), To be specific,  the space complecity is 2n.
 
 ## 1381. Design a Stack with Increment Operation
 
-I encounter the same problem in Lucid Software's OA, but the OA problem is more challenging. First, the OA problem has higher requirement for time efficiency. You must complete 2*10<sup>5</sup> operations in less then 4 seconds, so your `inc` operation must be O(1). Second, the range of increment value is -1\*10<sup>9</sup>~1\*10<sup>9</sup>. To avoid integer overflow, we should use long array instead of int array.
+I encountered the same problem in Lucid Software's OA, but the OA problem is more challenging. First, the OA problem has higher requirement for time efficiency. You must complete 2*10<sup>5</sup> operations in less then 4 seconds, so your `inc` operation must be O(1). Second, the range of increment value is -1\*10<sup>9</sup>~1\*10<sup>9</sup>. To avoid integer overflow, we should use long array instead of int array.
 
 ### Naive Approach: inc O(k)
 
