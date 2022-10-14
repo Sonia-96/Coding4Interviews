@@ -1755,6 +1755,48 @@ public class MaxStack {
 }
 ```
 
+## 735. Asteroid Collision
+
+Loop through the asteroids, and use a stack to store the stable asteroids. Say we have a stack with the rightmost asteroid `top`, and a `new` asteroid comes in. 
+
+- If `top` moves right (+) and `new` moves left (-), they collide. 
+
+  - If the size of `new` > `top`, `top` will blow up, and `new` might keep colliding the next `top`, so we should keep checking. Until `new` doesn't collide with top, we will add `new` to the stack.
+
+  - if new == top, both will blow up. We will stop checking
+
+  - if new < top, `new` will blow up. We will stop checking
+
+- else: push `new` to the stack
+
+
+```java
+class Solution {
+    public int[] asteroidCollision(int[] asteroids) {
+        Stack<Integer> stack = new Stack<>();
+        for (int asteroid : asteroids) {
+            collision: { // 需要复习！！
+                while (!stack.isEmpty() && asteroid < 0 && stack.peek() > 0) {
+                    if (-asteroid > stack.peek()) {
+                        stack.pop(); 
+                        continue; // 如果上一次循环满足这个条件，然后这次跳出了循环，应该把new放到stack里
+                    } else if (-asteroid == stack.peek()) {
+                        stack.pop();
+                    } 
+                    break collision;
+                }
+                stack.push(asteroid);
+            }
+        }
+        int[] res = new int[stack.size()];
+        for (int i = res.length - 1; i >= 0; i--) {
+            res[i] = stack.pop();
+        }
+        return res;
+    }
+}
+```
+
 ## 770. Basic Calculator IV
 
 太难了，光是理解答案就花了一天……先跟着答案敲一遍代码，后面再慢慢理解吧
@@ -2170,6 +2212,8 @@ Complexity analysis:
 
 1. Scan the string forward, delete all invalid `)`.
 2. Scan the string backward, delete all invaild `(`.
+
+`CharSequence` is a interface, `String` and `StringBuilder` both implements this interface.
 
 ```java
 class Solution {
