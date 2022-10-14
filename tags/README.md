@@ -1759,13 +1759,13 @@ public class MaxStack {
 
 Loop through the asteroids, and use a stack to store the stable asteroids. Say we have a stack with the rightmost asteroid `top`, and a `new` asteroid comes in. 
 
-- If `top` moves right (+) and `new` moves left (-), they collide. 
+- If `top` moves right (+) and `new` moves left (-), they will collide. 
 
-  - If the size of `new` > `top`, `top` will blow up, and `new` might keep colliding the next `top`, so we should keep checking. Until `new` doesn't collide with top, we will add `new` to the stack.
+  - If the size of `new` > `top`, `top` will blow up, then we need to check if `new` will collide with next `top`. In the next round, `new` and `top` might meet other conditions.
 
-  - if new == top, both will blow up. We will stop checking
+  - if `new` == `top`, both will blow up. We will stop checking
 
-  - if new < top, `new` will blow up. We will stop checking
+  - if `new` < `top`, `new` will blow up. We will stop checking
 
 - else: push `new` to the stack
 
@@ -1775,11 +1775,11 @@ class Solution {
     public int[] asteroidCollision(int[] asteroids) {
         Stack<Integer> stack = new Stack<>();
         for (int asteroid : asteroids) {
-            collision: { // 需要复习！！
+            collision: { 
                 while (!stack.isEmpty() && asteroid < 0 && stack.peek() > 0) {
                     if (-asteroid > stack.peek()) {
                         stack.pop(); 
-                        continue; // 如果上一次循环满足这个条件，然后这次跳出了循环，应该把new放到stack里
+                        continue; 
                     } else if (-asteroid == stack.peek()) {
                         stack.pop();
                     } 
