@@ -2548,6 +2548,65 @@ class LRUCache extends LinkedHashMap<Integer, Integer> {
 }
 ```
 
+## 128 Longest Consecutive Sequence
+
+### Approach #1: Sort
+
+Sort the nums in place, then count consequtive numbers. It should be noted that if the same number occurs multiple times, we just skip the occurances after the first time.
+
+```java
+class Solution {
+  	public int longestConsecutive(int[] nums) {
+        if (nums.length == 0) return 0;
+        Arrays.sort(nums);
+        int longest = 0, count = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] != nums[i - 1]) {
+                if(nums[i] == nums[i - 1] + 1) {
+                    count++;
+                } else {
+                    longest = Math.max(longest, count);
+                    count = 1;
+                }
+            }
+        }
+        return Math.max(longest, count);
+    }
+}
+```
+
+Time complexity: O(NlogN)
+
+### Approach #2: HashSet
+
+Use `HashSet` to store the numbers in the array. Iterating over the numbers, and find the highest consecutive number of the current number, then update the result. To improve time efficiency, we only attempt to build sequences from the numbers that are not already part of a longer sequence. To implement this goal, we just check if the `HashSet` contains `currentNum - 1`.
+
+```java
+class Solution {
+  	public int longestConsecutive(int[] nums) {
+        if (nums.length == 0) return 0;
+        Set<Integer> numSet = new HashSet<>();
+        for (int n : nums) {
+            numSet.add(n);
+        }
+        int longest = 0, count = 1;
+        for (int num : nums) {
+            if (!numSet.contains(num - 1)) {
+                int currNum = num;
+                while (numSet.contains(++currNum)) {
+                    count++;
+                }
+                longest = Math.max(longest, count);
+                count = 1;
+            }
+        }
+        return Math.max(longest, count);
+    }
+}
+```
+
+Time complexity: O(N)
+
 # 6 Heap
 
 # 7 Binary Search
