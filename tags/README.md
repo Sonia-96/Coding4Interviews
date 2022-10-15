@@ -2,7 +2,7 @@
 
 reference: https://zhuanlan.zhihu.com/p/349940945
 
-# Sort
+# 1 Sort
 
 | No.                            | Difficult | Tags                         | Last Completed | High-F |
 | ------------------------------ | --------- | ---------------------------- | -------------- | ------ |
@@ -476,7 +476,7 @@ class Solution {
 }
 ```
 
-# Linked List
+# 2 Linked List
 
 | No.                                           | Difficult | Tags                               | First Completed | High-F |
 | --------------------------------------------- | --------- | ---------------------------------- | --------------- | ------ |
@@ -789,7 +789,7 @@ class Solution {
 }
 ```
 
-# Queue
+# 3 Queue
 
 | No.                                  | Difficult | Tags               | Last Completed |
 | ------------------------------------ | --------- | ------------------ | -------------- |
@@ -1348,7 +1348,7 @@ class Solution {
 }
 ```
 
-# Stack
+# 4 Stack
 
 | No.                                               | Difficult | Tags         | First Completed | Last Completed | 次数 |      |
 | ------------------------------------------------- | --------- | ------------ | --------------- | -------------- | ---- | ---- |
@@ -2427,3 +2427,146 @@ Complexity analysis:
   - visit: worst O(n), best O(1)
   - back & forward: O(1)
 - Space complexity: O(m) for m websites
+
+# 5 Hash
+
+## 146. LRU Cache
+
+In this problem, we want to get and put key-value pair in O(1) time, so we need to use **HashMap**. On the other hand, we want to record the used history of each key, so we can maintain a **double linked list** which allows us to insert data into the head and tail. In Java, [LinkedHashMap](https://docs.oracle.com/javase/8/docs/api/java/util/LinkedHashMap.html) has such function.
+
+### Approach #1: DIY
+
+Use a customized class `Node` to store each key-value pair and their order and make them a double linked list. Use `HashMap<Integer, Node>` to store the key and the address of each key-value pair.
+
+1. `get`: use hashmap to find the node, then move the node to the head
+2. `put`: use hashmap to find the node
+   - if the node exists: update the value
+   - else:
+     - if the map is full: remove the head of linked list and insert the new node to the head
+     - Else: insert the new node to the head
+
+```java
+class LRUCache {
+  private static class Node {
+        int key;
+        int value;
+        Node prev;
+        Node next;
+
+        Node(int k, int v) {
+            key = k;
+            value = v;
+        }
+    }
+
+    int capacity;
+    Map<Integer, Node> cache;
+    Node sentinel;
+
+    public LRUCache(int cap) {
+        capacity = cap;
+        cache = new HashMap<>();
+        sentinel = new Node(-1, -1);
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
+    }
+
+    public int get(int key) {
+        if (cache.containsKey(key)) {
+            Node node = cache.get(key);
+            moveToHead(node);
+            return node.value;
+        }
+        return -1;
+    }
+
+    public void put(int key, int value) {
+        if (cache.containsKey(key)) {
+            Node node = cache.get(key);
+            node.value = value;
+            moveToHead(node);
+        } else {
+            Node node = new Node(key, value);
+            addHead(node);
+            cache.put(key, node);
+            if (cache.size() > capacity) {
+                Node last = removeLast();
+                cache.remove(last.key);
+            }
+        }
+    }
+
+    private void addHead(Node node) {
+        node.prev = sentinel;
+        node.next = sentinel.next;
+        sentinel.next = node;
+        node.next.prev = node;
+    }
+
+    private void removeNode(Node node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private void moveToHead(Node node) {
+        removeNode(node);
+        addHead(node);
+    }
+
+    private Node removeLast() {
+        Node last = sentinel.prev;
+        sentinel.prev = last.prev;
+        last.prev.next = sentinel;
+        return last;
+    }
+}
+```
+
+### Approach #2: use LinkedHashMap
+
+```java
+class LRUCache extends LinkedHashMap<Integer, Integer> {
+  	int capacity;
+
+    public q146b_LRUCache(int c) {
+        super(c, 0.75f, true); // true for accessOrder, false for insertion order
+        this.capacity = c;
+    }
+
+    public int get(int key) {
+        return super.get(key);
+    }
+
+    public void put(int key, int value) {
+        super.put(key, value);
+    }
+
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
+        return size() > capacity;
+    }
+}
+```
+
+# 6 Heap
+
+# 7 Binary Search
+
+# 8 Two Pointers
+
+# 9 BFS
+
+# 10 DFS
+
+# 11 Prefix Sum
+
+# 12 Union Find
+
+# 13 Monotone Stack／Queue
+
+# 14 Sweep Line
+
+# 15 TreeMap
+
+# 16 Dynamic Programming
+
