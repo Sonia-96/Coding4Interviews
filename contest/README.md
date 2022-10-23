@@ -708,3 +708,69 @@ class Solution {
 - 法二：check = check & gird1\[i]\[j] == 1
 
 法一的check值只由岛屿中最后一个格子决定；而法二中，只要岛屿中任一格子对应的grid1不为1，check就为false。所以法二是正确的。
+
+# Week Contest #316
+
+## 2446. Determine if Two Events Have Conflict
+
+You are given two arrays of strings that represent two inclusive events that happened **on the same day**, `event1` and `event2`, where:
+
+- `event1 = [startTime1, endTime1]` and
+- `event2 = [startTime2, endTime2]`.
+
+Event times are valid 24 hours format in the form of `HH:MM`.
+
+A **conflict** happens when two events have some non-empty intersection (i.e., some moment is common to both events).
+
+Return `true` *if there is a conflict between two events. Otherwise, return* `false`.
+
+**Example 1:**
+
+```
+Input: event1 = ["01:15","02:00"], event2 = ["02:00","03:00"]
+Output: true
+Explanation: The two events intersect at time 2:00.
+```
+
+**Example 2:**
+
+```
+Input: event1 = ["01:00","02:00"], event2 = ["01:20","03:00"]
+Output: true
+Explanation: The two events intersect starting from 01:20 to 02:00.
+```
+
+**Example 3:**
+
+```
+Input: event1 = ["10:00","11:00"], event2 = ["14:00","15:00"]
+Output: false
+Explanation: The two events do not intersect.
+```
+
+ ## Approach #1: no overlap
+
+This question is to determine if two line segments have overlapping parts. If they don't have overlaps, they meet the following condition: `end1 < start2 || end2 < start1 `. Overlap and no-overlap are exclusive, so we should return `!(end1 < start2 || end2 < start1)`. 
+
+Note, we can use `.compareTo()` to compare two time directly, instead of writing our own comparator.
+
+```java
+class Solution {
+    public boolean haveConflict(String[] event1, String[] event2) {
+        return !(event1[1].compareTo(event2[0]) < 0 || event2[1].compareTo(event1[0]) < 0);
+    }
+}
+```
+
+## Approach #2: overlap
+
+If two events have conflict, then `Math.max(start1, start2) <= Math.min(end1, end2)`, so `start1 <= end2 && start2 <= end1`.
+
+```java
+class Solution {
+    public boolean haveConflict(String[] event1, String[] event2) {
+        return event1[0].compareTo(event2[1]) <= 0 && event2[0].compareTo(event1[1]) <= 0;
+    }
+}
+```
+
