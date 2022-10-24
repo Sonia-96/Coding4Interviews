@@ -748,7 +748,7 @@ Output: false
 Explanation: The two events do not intersect.
 ```
 
- ## Approach #1: no overlap
+ ### Approach #1: no overlap
 
 This question is to determine if two line segments have overlapping parts. If they don't have overlaps, they meet the following condition: `end1 < start2 || end2 < start1 `. Overlap and no-overlap are exclusive, so we should return `!(end1 < start2 || end2 < start1)`. 
 
@@ -762,7 +762,7 @@ class Solution {
 }
 ```
 
-## Approach #2: overlap
+### Approach #2: overlap
 
 If two events have conflict, then `Math.max(start1, start2) <= Math.min(end1, end2)`, so `start1 <= end2 && start2 <= end1`.
 
@@ -774,3 +774,80 @@ class Solution {
 }
 ```
 
+## 2447. Number of Subarrays With GCD Equal to K
+
+```java
+class Solution {
+  private int GCD(int a, int b) {
+        while (b > 0) {
+            int remainder = a % b;
+            a = b;
+            b = remainder;
+        }
+        return a;
+    }
+
+    public int subarrayGCD(int[] nums, int k) {
+        int count = 0;
+        for (int i = 0; i < nums.length; i++) { // start index
+            int gcd = nums[i];
+            if (gcd == k) {
+                count += 1;
+            }
+            for (int j = i + 1; j < nums.length; j++) { // end index
+                gcd = GCD(gcd, nums[j]);
+                if (gcd < k) {
+                    break;
+                }
+                if (gcd == k) {
+                    count += 1;
+                }
+            }
+        }
+        return count;
+    }
+}
+```
+
+Complexity Analysis:
+
+- Time Complexity: O(n<sup>2</sup>logn)
+  - iterate over all subarrays: O(n<sup>2</sup>)
+  - time complexity for gcd(a, b) is O(log(ab)) = O(loga + logb) = O(logo)
+- Space Complexity: O(1)
+
+
+
+From this question, I learn:
+
+1. how to iterate the subarrays of an array:
+
+   ```java
+   for (int i = 0; i < nums.length; i++) { // start index
+     for (int j = i; j < nums.length; j++) { // end index
+       
+     }
+   }
+   ```
+
+   
+
+2. how to calculate the GCD of two numbers: GCD(a, b) = GCD(b, a % b) = ... = GCD(b', 0) = b'
+
+   ```java
+   GCD_iter(int a, int b) {
+     while (a > 0) {
+       int remainder = a % b;
+       a = b;
+       b = remainder;
+     }
+     return a;
+   }
+   
+   GCD_recur(int a, int b) {
+     if (b == 0) return a;
+    	return GCD_recur(b, a % b);
+   }
+   ```
+
+   
