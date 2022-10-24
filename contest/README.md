@@ -851,3 +851,54 @@ From this question, I learn:
    ```
 
    
+
+## 2448. Minimum Cost to Make Array Equal
+
+### Approach #1: Ternary search
+
+The cost function is convex (see [proof](https://leetcode.com/problems/minimum-cost-to-make-array-equal/discuss/2734728/Pure-math-based-explanation-of-why-Cost-Function-is-convex)). The cost will first decrease then increase. We can use [Ternary Search](https://en.wikipedia.org/wiki/Ternary_search) to find the minimum value. 
+
+- A Ternary Search determines either that the minimum/maximum cannot be in the first or last third of the domain, then repeats on the remaining two thirds.
+
+```java
+class Solution {
+  	private long computeCost(int[] nums, int[] cost, long target) {
+        long result = 0L;
+        for (int i = 0; i < nums.length; i++) {
+            result += Math.abs(target - nums[i]) * cost[i];
+        }
+        return result;
+    }
+
+    public long minCost(int[] nums, int[] cost) {
+        int low = nums[0], high = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > high) {
+                high = nums[i];
+            }
+            if (nums[i] < low) {
+                low = nums[i];
+            }
+        }
+        while (high > low) {
+            int mid1 = low + (high - low) / 3;
+            int mid2 = high - (high - low) / 3;
+
+            long cost1 = computeCost(nums, cost, mid1);
+            long cost2 = computeCost(nums, cost, mid2);
+            if (cost2 > cost1) {
+                high = mid2 - 1;
+            } else {
+                low = mid1 + 1;
+            }
+        }
+        return computeCost(nums, cost, low);
+    }
+}
+```
+
+What I learn from this question:
+
+- `computeCost` should return `long`
+- Ternary Search 
+
