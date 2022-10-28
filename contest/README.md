@@ -854,8 +854,6 @@ From this question, I learn:
 
 ## 2448. Minimum Cost to Make Array Equal
 
-### Approach #1: Ternary search
-
 The cost function is convex (see [proof](https://leetcode.com/problems/minimum-cost-to-make-array-equal/discuss/2734728/Pure-math-based-explanation-of-why-Cost-Function-is-convex)). The cost will first decrease then increase. We can use [Ternary Search](https://en.wikipedia.org/wiki/Ternary_search) to find the minimum value. 
 
 - A Ternary Search determines either that the minimum/maximum cannot be in the first or last third of the domain, then repeats on the remaining two thirds.

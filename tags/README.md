@@ -2442,7 +2442,7 @@ Use a customized class `Node` to store each key-value pair and their order and m
 2. `put`: use hashmap to find the node
    - if the node exists: update the value
    - else:
-     - if the map is full: remove the head of linked list and insert the new node to the head
+     - if the map is full: remove the tail from the linked list and map, then insert the new node to the head
      - Else: insert the new node to the head
 
 ```java
